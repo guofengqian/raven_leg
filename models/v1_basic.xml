@@ -1,0 +1,124 @@
+<!--
+  RAVEN 仿生腿 V1 基础模型
+  目标：两段式腿 + 固定底座，仅受重力自然摆动（暂无弹簧、电机）
+-->
+<mujoco model="raven_leg_v1_basic">
+
+  <!-- ========== 全局选项 ========== -->
+  <option
+    gravity="0 0 -9.81"
+    timestep="0.002"
+  />
+  <!-- gravity: 重力加速度，朝世界坐标系 -Z 方向
+       timestep: 仿真步长（秒），0.002 = 500 Hz -->
+
+  <!-- ========== 默认参数（子元素可继承，也可覆盖） ========== -->
+  <default>
+    <!-- 关节默认：轻微阻尼，避免永远晃个不停，又不会“粘死” -->
+    <joint damping="0.05" armature="0.001"/>
+    <!-- damping: 粘性阻尼，越大摆动衰减越快
+         armature: 转子惯量近似，略增惯量，仿真更稳 -->
+
+    <!-- 胶囊连杆默认外观与碰撞属性 -->
+    <geom type="capsule"
+          size="0.02"
+          rgba="0.7 0.7 0.75 1"
+          friction="0.8 0.1 0.1"
+          condim="3"/>
+    <!-- size: 胶囊半径（米）
+         rgba: 红绿蓝透明度
+         friction: 滑动 / 扭转 / 滚动摩擦系数
+         condim: 接触力维度（3 = 法向 + 两个切向摩擦） -->
+  </default>
+
+  <!-- ========== 视觉（仅影响显示，不影响物理） ========== -->
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+  </visual>
+
+  <asset>
+    <!-- 棋盘格地面纹理，方便看清腿在动 -->
+    <texture name="grid" type="2d" builtin="checker"
+             width="512" height="512"
+             rgb1="0.2 0.3 0.4" rgb2="0.3 0.4 0.5"/>
+    <material name="grid" texture="grid" texrepeat="8 8"
+              reflectance="0.1"/>
+  </asset>
+
+  <!-- ========== 世界：地面 + 固定底座 + 两段腿 ========== -->
+  <worldbody>
+
+    <!-- 地面：平面几何体，中心在原点，法向朝上 -->
+    <geom name="floor" type="plane" size="2 2 0.1"
+          material="grid" rgba="0.8 0.8 0.8 1"/>
+
+    <!-- 固定底座：没有 freejoint，相当于焊在世界上空
+         pos: 底座在世界坐标中的位置 (x, y, z)，单位米
+         挂在 z=0.6，让两段腿有足够空间下垂，暂不碰地 -->
+    <body name="base" pos="0 0 0.6">
+      <!-- 底座外观：小方块，方便在 viewer 里辨认挂点 -->
+      <geom name="base_geom" type="box" size="0.04 0.04 0.02"
+            rgba="0.3 0.3 0.35 1"/>
+
+      <!-- ===== 第一段：大腿（hip → 下端） =====
+           pos: 相对父 body（base）的偏移，从底座中心稍往下一点 -->
+      <body name="thigh" pos="0 0 0">
+        <!-- 髋关节：铰链，绕 Y 轴转 → 腿在 XZ 平面（矢状面）前后摆 -->
+        <joint name="hip"
+               type="hinge"
+               axis="0 1 0"
+               pos="0 0 0"
+               limited="false"/>
+        <!-- axis: 旋转轴方向（这里是世界/父系的 Y）
+             limited=false: 暂不限制角度，先看自然摆动 -->
+
+        <!-- 大腿胶囊：从关节处沿 -Z 画到 0.25 m 处
+             fromto: 胶囊两端点坐标（相对本 body） -->
+        <geom name="thigh_geom"
+              fromto="0 0 0  0 0 -0.25"
+              rgba="0.55 0.65 0.85 1"/>
+        <!-- 质量由 geom 密度自动算；也可显式写 <inertial>，V1 先用默认 -->
+
+        <!-- 惯性：简单给定，避免默认密度导致过轻/过重
+             pos: 质心约在大腿中点
+             mass: 质量（千克）
+             diaginertia: 绕质心三轴的转动惯量（千克·米²） -->
+        <inertial pos="0 0 -0.125" mass="0.5"
+                  diaginertia="0.003 0.003 0.0005"/>
+
+        <!-- ===== 第二段：小腿（接在大腿末端） =====
+             pos: 相对大腿原点向下 0.25 m，对齐大腿胶囊下端 -->
+        <body name="shank" pos="0 0 -0.25">
+          <!-- 踝/段间关节：同样绕 Y 轴铰链（V1 省略真实膝关节） -->
+          <joint name="ankle"
+                 type="hinge"
+                 axis="0 1 0"
+                 pos="0 0 0"
+                 limited="false"/>
+
+          <!-- 小腿胶囊：再向下延伸 0.25 m -->
+          <geom name="shank_geom"
+                fromto="0 0 0  0 0 -0.25"
+                rgba="0.85 0.55 0.45 1"/>
+
+          <inertial pos="0 0 -0.125" mass="0.35"
+                    diaginertia="0.002 0.002 0.0003"/>
+        </body>
+      </body>
+    </body>
+
+  </worldbody>
+
+  <!-- V1 故意不写 <actuator> 和弹簧 tendon/equality，
+       下一版再加电机与踝弹簧 -->
+
+  <!-- 关键帧：记下“倾斜起始姿势”，给 Python 脚本重置时用
+       qpos: 与关节顺序一致 → hip, ankle（单位：弧度）
+       注意：不要在被动 viewer 里按数字键 0（容易黑屏） -->
+  <keyframe>
+    <key name="tilt_start" qpos="0.4 -0.3"/>
+  </keyframe>
+
+</mujoco>
+

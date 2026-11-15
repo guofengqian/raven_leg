@@ -1,0 +1,7 @@
+{
+  "mujoco-viewer.editor.defaultViewer": "viewer",
+  "mujoco-viewer.editor.openBehavior": "beside",
+  "workbench.editorAssociations": {
+    "*.xml": "mujoco-viewer.editor"
+  }
+}
