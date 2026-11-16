@@ -15,6 +15,7 @@ from pathlib import Path
 
 import mujoco
 import mujoco.viewer
+import numpy as np
 
 
 def _ensure_mjpython_on_macos() -> None:
@@ -88,6 +89,22 @@ def _pd_control(model: mujoco.MjModel, data: mujoco.MjData, target) -> None:
         data.ctrl[i] = max(lo, min(hi, torque))
 
 
+# ===== 脚触地检测（V3）=====
+def _foot_contacts(model: mujoco.MjModel, data: mujoco.MjData, foot_id: int):
+    """返回脚掌参与的所有接触：[(接触点世界坐标, 法向力大小 N), ...]。
+    法向力用 mj_contactForce 取接触坐标系的第 0 分量（沿接触法线方向）。
+    注意：mj_contactForce 的 result 必须是长度为 6 的 numpy 数组，普通 list 会报错。"""
+    out = []
+    for i in range(data.ncon):
+        con = data.contact[i]
+        if con.geom1 != foot_id and con.geom2 != foot_id:
+            continue
+        force = np.zeros(6)
+        mujoco.mj_contactForce(model, data, i, force)
+        out.append((con.pos.copy(), abs(force[0])))
+    return out
+
+
 def main() -> None:
     _ensure_mjpython_on_macos()
 
@@ -155,6 +172,12 @@ def main() -> None:
         # 本模型方向：gravity="0 0 -9.81" → +Z 朝上、重力沿 -Z 朝下；
         #             +X 朝右，+Y 朝前（从屏幕里指向观察者）。
 
+        # 脚掌 geom 的 id，用于识别"脚"参与的接触（V3）
+        foot_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "foot_geom")
+
+        # 上次打印接触状态的时间，避免每帧刷屏（每 0.5 秒报一次）
+        last_report = -1.0
+
         while viewer.is_running():
             step_start = time.time()
 
@@ -171,6 +194,16 @@ def main() -> None:
                 _pd_control(model, data, current_target)
 
             mujoco.mj_step(model, data)
+
+            # ===== 脚触地状态：终端汇报 + viewer 里画接触点（V3）=====
+            contacts = _foot_contacts(model, data, foot_id)
+            total_fn = sum(f for _, f in contacts)
+            if data.time - last_report >= 0.5:
+                last_report = data.time
+                state = "着地" if contacts else "悬空"
+                print(f"[触地] {state}  脚底法向力={total_fn:6.2f}N  "
+                      f"hip={math.degrees(data.qpos[0]):+6.1f}°  "
+                      f"ankle={math.degrees(data.qpos[1]):+6.1f}°")
 
             viewer.sync()
 
