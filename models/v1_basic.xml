@@ -53,6 +53,28 @@
     <geom name="floor" type="plane" size="2 2 0.1"
           material="grid" rgba="0.8 0.8 0.8 1"/>
 
+    <!-- ===== 细坐标轴（装饰用，不参与碰撞，放在右侧不挡杆子）=====
+         为什么不用 viewer 自带的世界坐标轴：它画在原点、较粗，会挡住杆子，且没有轴名。
+         这里自建一组细轴：3 根胶囊分别沿 +X / +Y / +Z，颜色固定为 红/绿/蓝。
+         size=0.008 → 轴很细；contype=0 conaffinity=0 → 不产生接触力，纯装饰。
+         末端 3 个 site 名为 X/Y/Z，配合 viewer 的 mjLABEL_SITE 会在轴尖显示轴名。
+         body 放在 x=0.9 右侧，远离杆子（杆子在 x≈0 附近摆动），避免遮挡。 -->
+    <body name="axis_tripod" pos="0.9 0 0.02">
+      <!-- X 轴：红色，沿 +X 方向 -->
+      <geom name="axis_x" type="capsule" fromto="0 0 0  0.3 0 0"
+            size="0.008" rgba="1 0 0 1" contype="0" conaffinity="0"/>
+      <!-- Y 轴：绿色，沿 +Y 方向 -->
+      <geom name="axis_y" type="capsule" fromto="0 0 0  0 0.3 0"
+            size="0.008" rgba="0 1 0 1" contype="0" conaffinity="0"/>
+      <!-- Z 轴：蓝色，沿 +Z 方向 -->
+      <geom name="axis_z" type="capsule" fromto="0 0 0  0 0 0.3"
+            size="0.008" rgba="0 0 1 1" contype="0" conaffinity="0"/>
+      <!-- 轴尖标记点：site 的名字就是 viewer 里显示的轴名 -->
+      <site name="X" pos="0.3 0 0" size="0.005"/>
+      <site name="Y" pos="0 0.3 0" size="0.005"/>
+      <site name="Z" pos="0 0 0.3" size="0.005"/>
+    </body>
+
     <!-- 固定底座：没有 freejoint，相当于焊在世界上空
          pos: 底座在世界坐标中的位置 (x, y, z)，单位米
          挂在 z=0.6，让两段腿有足够空间下垂，暂不碰地 -->
@@ -69,9 +91,18 @@
                type="hinge"
                axis="0 1 0"
                pos="0 0 0"
-               limited="false"/>
+               limited="false"
+               damping="0.7"/>
+        <!-- damping: 髋关节粘性阻尼，单独覆盖默认的 0.05（仅影响髋，踝仍为 0.05）
+             阻尼越大 → 摆动衰减越快，更快停住 -->
         <!-- axis: 旋转轴方向（这里是世界/父系的 Y）
              limited=false: 暂不限制角度，先看自然摆动 -->
+
+        <!-- ===== hip 角度定义（三条规则，避免符号搞反）=====
+             1) 参考轴：大腿在 qpos=0 时沿 -Z 竖直向下；
+             2) 正方向：绕 +Y 轴右手定则为正 → 从 +Y 侧看过去逆时针为正；
+             3) 取边：正角时大腿从竖直向下朝 -X 方向摆（屏幕上向左）。
+             例：qpos[hip]=+0.7854 → 大腿向左摆 45°；负值则向右摆。 -->
 
         <!-- 大腿胶囊：从关节处沿 -Z 画到 0.25 m 处
              fromto: 胶囊两端点坐标（相对本 body） -->
@@ -95,7 +126,16 @@
                  type="hinge"
                  axis="0 1 0"
                  pos="0 0 0"
-                 limited="false"/>
+                 limited="false"
+                 stiffness="2.0"
+                 springref="0.0"/>
+          <!-- 踝关节扭转弹簧（V2）：
+               stiffness = 2.0 → 弹簧刚度（单位 N·m/弧度），越大越“硬”、越难被掰开
+               springref = 0.0 → 弹簧“原长”对应的关节角（弧度），0 表示小腿与大腿伸直成一条线
+               物理效果：关节偏离 0 时，弹簧产生恢复力矩
+                          力矩 = -stiffness × (当前角 - springref)，
+                          把小腿拉回伸直方向，模拟生物踝关节的弹性储能。
+               （此力矩是被动的，由物理引擎自动施加，不需要 Python 写代码。） -->
 
           <!-- 小腿胶囊：再向下延伸 0.25 m -->
           <geom name="shank_geom"
@@ -110,14 +150,28 @@
 
   </worldbody>
 
-  <!-- V1 故意不写 <actuator> 和弹簧 tendon/equality，
-       下一版再加电机与踝弹簧 -->
+  <!-- ========== 执行器：给髋关节和踝关节加电机（V2） ==========
+       <motor> 是“力矩电机”：Python 里往 data.ctrl 写的数值 × gear = 输出力矩（单位 N·m）。
+       gear=1 → ctrl 写多少就是多少力矩。
+       ctrllimited=true + ctrlrange：限制控制指令范围，防止力矩过大把模型甩飞。
+       控制顺序：data.ctrl = [hip_motor, ankle_motor]，与下方定义顺序一致。
+       （踝弹簧 tendon 留到下一版再加） -->
+  <actuator>
+    <!-- 髋关节电机：驱动 hip 关节，允许力矩 ±10 N·m -->
+    <motor name="hip_motor" joint="hip" gear="1"
+           ctrllimited="true" ctrlrange="-10 10"/>
+    <!-- 踝关节电机：驱动 ankle 关节，允许力矩 ±5 N·m（小腿较轻，给小一点） -->
+    <motor name="ankle_motor" joint="ankle" gear="1"
+           ctrllimited="true" ctrlrange="-5 5"/>
+  </actuator>
 
   <!-- 关键帧：记下“倾斜起始姿势”，给 Python 脚本重置时用
        qpos: 与关节顺序一致 → hip, ankle（单位：弧度）
+       hip = 0.7854 rad ≈ 45°（大腿初始角度，正角 → 朝 -X 方向摆 45°，详见上方 hip 角度定义）
+       ankle 保持 -0.3 rad 不变
        注意：不要在被动 viewer 里按数字键 0（容易黑屏） -->
   <keyframe>
-    <key name="tilt_start" qpos="0.4 -0.3"/>
+    <key name="tilt_start" qpos="0.7854 -0.3"/>
   </keyframe>
 
 </mujoco>
