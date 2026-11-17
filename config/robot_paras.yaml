@@ -1,0 +1,323 @@
+# =============================================================================
+# RAVEN 硬件参数文件
+# -----------------------------------------------------------------------------
+# 来源论文：Fast ground-to-air transition with avian-inspired multifunctional legs
+#           （EPFL，Science Robotics）
+# 论文副本：reference/Fast ground-to-air transition with avian-inspired multifunctional legs.pdf
+#
+# 来源标注约定（每条参数都可溯源）：
+#   [pNN] = 正文第 NN 页
+#   [T1]  = Extended Data Table 1  Mass breakdown of RAVEN        (PDF 第 31 页)
+#   [T2]  = Extended Data Table 2  Simulation parameters           (PDF 第 32 页)
+#   [F5]  = Extended Data Fig. 5   动力学模型示意（2D, 6 自由度 Lagrange）
+#   [待确认] = 论文正文/表格未明确说明含义，需对照原文图注核对后再使用
+#
+# 说明：
+#   - Table 1 是【真实物理样机】的逐件质量称量；
+#   - Table 2 是【论文做跳跃仿真】时用的简化模型参数；
+#     两者数值不完全一致（例如 Table 2 里 body mass = 0.5 kg，
+#     是把机身+电子+机翼+尾简化为一个 0.5 kg 刚体），使用时注意区分。
+# =============================================================================
+
+meta:                                    # 文件元信息，不参与物理计算
+  robot_name: RAVEN                       # 机器人名称
+  paper: "Fast ground-to-air transition with avian-inspired multifunctional legs"  # 来源论文标题
+  institution: EPFL                       # 研制单位：洛桑联邦理工学院
+  mimicked_bird: carrion crow (小嘴乌鸦)  # 仿生对象：小嘴乌鸦  [p12]
+  units: SI unless a suffix in the key says otherwise  # 单位制：默认 SI，键名后缀会标明特殊单位
+
+# =============================================================================
+# 整机
+# =============================================================================
+robot:                                   # 整机层面的总体参数
+  total_mass_kg: 0.62318       # 整机总质量（千克），[T1] 质量表所有组件相加 = 623.18 g
+  total_mass_paper_text_kg: 0.6  # 论文正文写的整机质量（千克），[p12] 称 "weighs 600 gram"，与 T1 称量值略有出入
+  wingspan_m: 1.0              # 翼展（米），[p12] 100 cm
+  body_length_m: 0.5           # 机身长度（米），[p12, T2] 50 cm
+  battery: "Gens Ace 700mAh 3s"  # 电池型号，[T1, p18] 3 芯锂电池，容量 700 毫安时
+
+# =============================================================================
+# 动力学仿真模型参数  [T2]
+# 论文用 2D Lagrange、6 个广义坐标做跳跃起飞仿真（见正文 p13）。
+# =============================================================================
+simulation:                              # 论文跳跃仿真所用的简化模型参数
+  generalized_coords: 6        # 广义坐标数量（自由度），[p13] q1 水平 / q2 竖直 / q3 俯仰 / q4 上肢角 / q5 下肢角 / q6 脚趾偏转角
+  gravity_m_per_s2: 9.81       # 重力加速度（米/秒²），[p12]
+
+  initial:                     # 起跳前的初始姿态角（度），[T2]
+    pitch_deg: 10              # 初始机身俯仰角：机身前倾 10°
+    hip_deg: 135               # 初始髋关节角 135°
+    ankle_deg: 145             # 初始踝关节角 145°
+    toe_deflection_deg: 25     # 初始脚趾偏转角 25°
+
+  links:                       # 仿真模型中各刚体的质量分配（千克），[T2]
+    body_mass_kg: 0.5          # 机身质量：把机身+电子+机翼+尾简化为 0.5 kg 的一个刚体
+    upper_limb_mass_kg: 0.015  # 上肢（胫跗骨）质量
+    lower_limb_mass_kg: 0.015  # 下肢（跗跖骨）质量
+    palm_mass_kg: 0.015        # 脚掌（palm）质量
+    toe_mass_kg: 0.005         # 脚趾（toe）质量
+    # 注：以上 5 项 = Extended Data Table 2 给出的【全部】刚体质量。
+    #     论文未提供各刚体的质心坐标或转动惯量张量（正文 p13-16 也只给质量矩阵 M(q) 的形式，未枚举数值），
+    #     因此这里不补质心/惯量，避免无依据编造。若仿真需要，须另查来源或按几何/材料估算并另行确认。
+    #
+    # 质心位置【无数值，仅有定性可行域】（尚未定值，暂不参与计算）：
+    #   - 机身质心在本体坐标系中的偏移 (d_x, d_z)，原点 = 髋关节、x 指向机头、z 指向背侧；
+    #   - 可行域：d_x ∈ (-0.02, 0) m（在髋关节后方、且在机翼压心 P_wx = -0.02 之前，
+    #             这样才满足 [p4] "CoM 位于气动中立点之前与之下" 的被动稳定性条件）；
+    #   - 可行域：d_z ∈ (0, 约 0.052) m（在髋关节上方、且在气动中立点下方）；
+    #   - 附加定性约束：质心地面投影须落在趾关节与后爪构成的支撑多边形内（[p4]、[F3d]）。
+    #   - 各连杆质心距 c1~c4、各刚体转动惯量 I_b~I_4 同样论文未给，均未估算。
+    #   - 详细推导与登记见 doc/missing_params_log.md。
+
+  geometry:                    # 仿真模型的几何长度（米），[T2]；定义见正文 p14 与 Extended Data Fig. 5
+    body_length_m: 0.5         # 机身长度
+    l1_m: 0.12                 # 上肢（胫跗骨）长度，[p14] 原文："l1 and l2 are the upper limb and lower limb lengths"
+    l2_m: 0.12                 # 下肢（跗跖骨）长度，[p14]
+    l3_m: 0.023                # 脚趾关节的偏移长度，[p14] 原文："l3 and θ3 are the offset length and angle of the toe joint"
+    l4_m: 0.06                 # 脚趾长度，[p14] 原文："l4 is the toe length"
+    theta3_deg: 45             # 脚趾关节的偏移角度，[p14]
+
+  aerodynamics:                # 空气动力相关参数，[T2]
+    air_density_kg_per_m3: 1.225  # 空气密度（千克/米³），海平面标准值
+    wing_area_m2: 0.18         # 机翼面积（米²）
+    tail_area_m2: 0.0864       # 尾翼面积（米²）
+    wing_angle_offset_deg: 7   # 机翼安装角偏移（度）
+    tail_angle_offset_deg: 1   # 尾翼安装角偏移（度）
+    thrust_angle_offset_deg: 7 # 推力方向角偏移（度）
+    max_thrust_kg: 0.63        # 最大推力（以千克力计），换算成牛顿 ≈ 0.63 × 9.81 ≈ 6.18 N
+
+  spring:                      # 关节扭转弹簧的刚度，[T2]
+    ankle_constant_Nmm_per_deg: 3.207  # 踝关节弹簧刚度（牛·毫米/度）：每偏转 1° 产生 3.207 N·mm 的恢复力矩
+    toe_constant_Nmm_per_deg: 6.249    # 脚趾关节弹簧刚度（牛·毫米/度）
+
+  # 气动力作用点（机翼压心、尾翼压心）—— 定义说明：
+  #   Table 2 原文【只有符号 + 数值】，论文正文与图注均【未给出文字定义】。
+  #   以下定义依据 [F5] 图面反推（图注：绿色 = 常数参数，红色箭头 = 外力）：
+  #     · p_w（绿）标在机翼升力 f_w,lift 与阻力 f_w,drag 箭头的交汇点上 → 机翼气动力作用点；
+  #     · p_t（绿）标在尾翼升力 f_t,lift 与阻力 f_t,drag 箭头的交汇点上 → 尾翼气动力作用点；
+  #     · 二者都固连于机身，与式(11) f_ext = f_p + f_w + f_t + τ_a + τ_t 中的 f_w、f_t 配套使用；
+  #     · "Body frame" 十字原点画在【髋关节铰点】，故参考点以此为原点（不是机身质心）。
+  #   坐标轴约定（本体坐标系 B-x_B z_B）：
+  #     · x_B 沿机身纵轴、指向机头为正（所以负值 = 髋关节后方）；
+  #     · z_B 垂直于机身纵轴、指向背侧（远离腿的一侧）为正。
+  #   命名说明：
+  #     · 论文的 2D 平面里横轴写 x、纵轴写 y（Base frame 标 x 右 / y 上），
+  #       所以论文的 P_w,y / P_t,y 指的是【平面内竖直方向】的偏移，不是左右（侧向）偏移；
+  #     · 本项目统一用 X 水平 / Z 竖直，故把论文的 y 分量改名为 z 分量（P_wz_m / P_tz_m）。
+  #   用于广义外力：p_w(q) = [q1 q2]ᵀ + R(q3)·[P_wx P_wz]ᵀ，
+  #                机翼广义力 = (∂p_w/∂q)ᵀ·f_w；尾翼同理。
+  reference_points:            # 气动力作用点在本体坐标系（原点 = 髋关节）下的坐标（米），[T2]，定义见 [F5]
+    P_wx_m: -0.02              # 机翼压心 x：髋关节后方 2 cm（负值 = 朝机尾方向）
+    P_wz_m: 0.042              # 机翼压心 z：机身纵轴背侧（上方）4.2 cm
+    P_tx_m: -0.28              # 尾翼压心 x：髋关节后方 28 cm
+    P_tz_m: 0.074              # 尾翼压心 z：机身纵轴背侧（上方）7.4 cm
+
+# =============================================================================
+# 关节与弹簧
+# =============================================================================
+joints:                                  # 各关节及其扭转弹簧的真实硬件参数
+  ankle:                                 # 踝关节
+    spring:                              # 踝关节的扭转弹簧
+      model: "Durovis 16124"               # 弹簧型号，[T1]
+      mass_g: 5.75                          # 单个弹簧质量（克），[T1]
+      constant_Nmm_per_deg: 3.207           # 弹簧刚度（牛·毫米/度），[T2]
+      count_per_leg: 1                      # 每条腿配 1 个
+  toe:                                   # 脚趾关节
+    spring:                              # 脚趾关节的扭转弹簧
+      model: "Durovis 14081"               # 弹簧型号，[T1]
+      mass_g: 1.52                          # 单个弹簧质量（克），[T1]
+      constant_Nmm_per_deg: 6.249           # 弹簧刚度（牛·毫米/度），[T2]
+      count_per_leg: 1                      # 每条腿配 1 个
+
+# =============================================================================
+# 执行器
+# =============================================================================
+actuators:                               # 电机、减速器等驱动部件的真实硬件参数
+  leg_motor:                             # 腿关节驱动电机（髋 + 踝共用同型号）
+    model: "T-Motor AT2303 KV1500 Short Shaft"   # 电机型号，[p12, T1]
+    mass_g: 19.80                                 # 单个电机质量（克，含连接器），[T1]
+    max_power_W: 100                              # 额定最大功率（瓦），[p12]
+    available_power_ratio: 0.10                   # 可用功率占比，[p12] 高速段实际只用额定功率的 10%
+    safety_factor: 2                              # 安全系数，[p12] 传动系统损耗的额外余量
+    count_total: 4                                # 总数：2 条腿 × (髋 + 踝) = 4 个
+  gearbox:                               # 行星齿轮箱（电机减速用）
+    type: planetary                      # 类型：行星齿轮箱
+    ratio: 19.13                  # 减速比 1:19.13，[p12, p17] 太阳轮 9 齿 / 复合行星 10+32 齿 / 齿圈 59 齿
+    mass_g: 17.30                 # 单个齿轮箱质量（克），[T1]
+    count_total: 4                # 总数 4 个（每条腿髋、踝各 1 个）
+  timing_belt:                           # 同步带（踝关节传动）
+    model: "Contitech Syncroflex 6/T2.5/285 SS"   # 同步带型号，[T1]
+    mass_g: 1.94                  # 单条质量（克），[T1]
+    count_total: 2                # 总数 2 条（每条腿踝传动 1 条）
+  propeller_motor:                       # 飞行推进用的螺旋桨电机
+    model: "T-Motor AT2306 KV2300 Short Shaft"    # 电机型号，[T1, p18]
+    mass_g: 30.73                 # 电机质量（克）
+    esc: "T-Motor F30A 3-6S"      # 配套电调型号，[p18] 支持 3~6 芯电池
+    propeller: "GWS 8040"          # 配套螺旋桨型号，[p18] 8 英寸桨
+    count: 1                      # 数量 1 个
+  servo:                               # 舵机（驱动副翼和尾舵）
+    model: "KST X08H"             # 舵机型号，[T1, p18]
+    mass_g: 8.94                  # 单个质量（克）
+    count: 3                      # 数量 3 个：2 个副翼 + 1 个尾舵
+
+# =============================================================================
+# 连杆结构（真实样机）  [p17-18]
+# =============================================================================
+structure:                               # 样机各连杆的结构与材料
+  chassis:                               # 机身骨架/底盘
+    spec: "6 mm × 6 mm 碳纤维方杆"       # 截面规格
+    material: "Swiss Composite CFK-Vierkantrohr 6x6 mm"   # 材料型号，[T1, p18]
+  upper_limb:           # 上肢（胫跗骨 tibiotarsus），连接髋→踝
+    material: "碳纤维方杆"               # 材料
+    composition: "2 根 4 mm × 4 mm + 1 根 3 mm × 3 mm"   # 组成方式，[p17] 三根碳纤维方杆拼成
+    mass_g: 9.71                # 单根质量（克），[T1]
+  lower_limb:           # 下肢（跗跖骨 tarsometatarsus），连接踝→脚
+    material: "碳纤维方杆"               # 材料
+    composition: "1 根 4 mm × 4 mm"      # 组成方式，[p18] 单根碳纤维方杆
+    mass_g: 4.43                # 单根质量（克），[T1]
+  foot:                                  # 脚
+    mass_g: 17.47               # 单只脚质量（克），[T1]
+    design: "offset 关节 + 前掌 + 3 个前趾 + 1 个后趾 hallux"   # 结构设计，[p13]
+    sole_pad: "Ecoflex 20 (Smooth-On) 硅胶垫，增加摩擦"          # 脚底垫材料，[p18]
+  wing_tail:                             # 机翼与尾翼
+    material: "EPP 泡沫（密度 20 kg/m³），CNC 切割"             # 材料与工艺，[p18]
+    airfoil: "SD7080（机翼）/ 平板（尾）" # 翼型，[p18]
+
+# =============================================================================
+# 真实样机质量分解  [T1]（完整逐件，单位 g）
+# 子项小计：Body structure 60.57 | Electric on body 189.36
+#          Aerodynamic surfaces 143.21 | Legs 230.04 | 合计 623.18
+# 每个部件字段含义：mass_g = 单件质量（克）；qty = 数量；model = 型号
+# =============================================================================
+mass_breakdown:
+  body_structure:                        # 机身结构件
+    _subtotal_g: 60.57       # 本类小计（克）
+    chassis:                 # 底盘骨架
+      mass_g: 10.80          # 单件质量（克）
+      qty: 1                 # 数量
+    reflective_markers:      # 反光标记点（动捕系统用）
+      mass_g: 9.52
+      qty: 1
+    protective_foam:         # 保护泡沫
+      mass_g: 9.06
+      qty: 1
+    electric_components_holding_board:  # 电子元件固定板
+      mass_g: 4.31
+      qty: 1
+    leg_holding_frames:      # 腿固定支架
+      mass_g: 3.80
+      qty: 2                 # 左右各 1
+    leg_rest:                # 腿停靠/支撑件
+      mass_g: 3.00
+      qty: 1
+    wing_connector:          # 机翼连接件
+      mass_g: 5.26
+      qty: 1
+    propeller_motor_holder:  # 螺旋桨电机座
+      mass_g: 2.51
+      qty: 1
+    servo_holder:            # 舵机座
+      mass_g: 1.39
+      qty: 1
+    tail_holder:             # 尾翼座
+      mass_g: 2.22
+      qty: 1
+    screw_and_nut:           # 螺丝螺母
+      mass_g: 0.35
+      qty: 14
+
+  electric_components_on_body:           # 机身上的电子元件
+    _subtotal_g: 189.36      # 本类小计（克）
+    battery:                 # 电池
+      mass_g: 52.48
+      qty: 1
+      model: "Gens Ace 700mAh 3s"
+    microcontroller:         # 主控制器
+      mass_g: 9.36
+      qty: 1
+      model: "STM32 B-G431B-ESC1"
+    motor_controller:        # 电机控制器（驱动腿电机）
+      mass_g: 9.36
+      qty: 4
+      model: "STM32 B-G431B-ESC1"
+    esc:                     # 电调（驱动螺旋桨电机）
+      mass_g: 10.01
+      qty: 1
+      model: "T-Motor F30A 3-6S"
+    rc_receiver:             # 遥控接收机
+      mass_g: 4.00
+      qty: 1
+      model: "FrSky RX6R"
+    current_sensor:          # 电流传感器（测功耗）
+      mass_g: 4.67
+      qty: 1
+      model: "ACS758KCB-150B-PSS-T"
+    sd_card_reader:          # SD 卡读卡器（记录数据）
+      mass_g: 2.72
+      qty: 1
+      model: "SparkFun microSD Transflash Breakout + SD card"
+    secondary_mcu:           # 副微控制器（读电流并写 SD）
+      mass_g: 2.40
+      qty: 1
+      model: "Seeed Studio XIAO nRF52840"
+    voltage_converter_5v:    # 5V 稳压模块
+      mass_g: 2.00
+      qty: 1
+      model: "Murata OKI-78SR-5/1.5-W36-C"
+    wires_pins_connectors:   # 导线、插针、连接器
+      mass_g: 64.28
+      qty: 1
+
+  aerodynamic_surfaces:                  # 气动力面（机翼、尾翼、舵面）
+    _subtotal_g: 143.21      # 本类小计（克）
+    wing:                    # 机翼
+      mass_g: 30.80
+      qty: 2
+    tail:                    # 尾翼
+      mass_g: 18.84
+      qty: 1
+    servo_motor:             # 舵机（副翼+尾舵）
+      mass_g: 8.94
+      qty: 3
+      model: "KST X08H"
+    propeller_motor:         # 螺旋桨电机
+      mass_g: 30.73
+      qty: 1
+      model: "T-Motor AT2306 KV2300 Short Shaft"
+    propeller:               # 螺旋桨
+      mass_g: 5.22
+      qty: 1
+      model: "GWS 8040"
+
+  legs:                                  # 腿（两侧合计）
+    _subtotal_g: 230.04      # 本类小计（克）
+    leg_motor:               # 腿电机（髋 + 踝）
+      mass_g: 19.80
+      qty: 4
+      model: "T-Motor AT2303 KV1500 Short Shaft"
+    gearbox:                 # 齿轮箱
+      mass_g: 17.30
+      qty: 4
+    timing_belt:             # 同步带（踝传动）
+      mass_g: 1.94
+      qty: 2
+      model: "Contitech Syncroflex 6/T2.5/285 SS"
+    ankle_spring:            # 踝关节弹簧
+      mass_g: 5.75
+      qty: 2
+      model: "Durovis 16124"
+    toe_spring:              # 脚趾关节弹簧
+      mass_g: 1.52
+      qty: 2
+      model: "Durovis 14081"
+    upper_limb:              # 上肢（胫跗骨）
+      mass_g: 9.71
+      qty: 2
+    lower_limb:              # 下肢（跗跖骨）
+      mass_g: 4.43
+      qty: 2
+    foot:                    # 脚
+      mass_g: 17.47
+      qty: 2
+
+  total_robot_mass_g: 623.18  # 整机总质量（克），T1 表底合计
