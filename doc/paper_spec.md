@@ -17,7 +17,7 @@ $$\mathbf{q} = \begin{bmatrix} q_1 & q_2 & q_3 & q_4 & q_5 & q_6 \end{bmatrix}^T
 > **$(q_1, q_2)$ 的物理位置**：论文 p14 式 (6) 把足端位置写为
 > $\mathbf{p}_{tip} = [q_1\ q_2]^T + R(q_{4,abs})[l_1\ 0]^T + R(q_{5,abs})[l_2\ 0]^T + R(\theta_3)[l_3\ 0]^T$，
 > 即 $(q_1, q_2)$ 是腿链的起点（髋关节铰点），Extended Data Fig. 5a 中 "Body frame" 的坐标十字也画在髋关节处。
-> 因此机身质心**不**在该点，而在本体系 $+x_B$（机头）方向的前方，偏移量记作 $(d_x, d_z)$，见 §1.2。
+> 因此机身质心**不**在该点。按论文 p4 与 Extended Data Fig. 3d 的定性条件，质心位于髋关节**后方**（$d_x<0$、且仍在机翼压心之前）与**上方**（$d_z>0$），偏移量记作 $(d_x, d_z)$，见 §1.2。
 
 > 符号一致性说明：本文档的广义坐标统一采用 $q_1\!\sim\! q_6$，与 `config/robot_paras.yaml` 的 `initial`（`pitch_deg`→$q_3$、`hip_deg`→$q_4$、`ankle_deg`→$q_5$、`toe_deflection_deg`→$q_6$）一一对应。
 
@@ -39,7 +39,10 @@ $$\mathbf{q} = \begin{bmatrix} q_1 & q_2 & q_3 & q_4 & q_5 & q_6 \end{bmatrix}^T
 * **$x_B$ 轴**：沿机身纵轴指向头部（机头方向），固连于机身。
 * **$z_B$ 轴**：在矢状面内垂直于 $x_B$，由 $x_B$ 逆时针旋转 $90^\circ$ 得到；$z_B$ 与 $x_B$、$Y$ 轴（垂直纸面向外）构成右手系，即 $Y = z_B \times x_B$。
 * **姿态唯一由 $q_3$ 决定**：机身无独立横滚/偏航自由度，因此本体系相对世界系只差一个绕 $Y$ 轴的旋转 $q_3$。
-* **机身质心 $C$ 的位置**：质心位于本体系内 $\mathbf{p}^{B}_{C} = (d_x, d_z)$，其中 $d_x > 0$ 表示质心在原点前方（机头方向）。论文未给出该偏移的数值，符号与量纲已确定、数值待确认（见 `doc/missing_params_log.md`）。
+* **机身质心 $C$ 的位置**：质心位于本体系内 $\mathbf{p}^{B}_{C} = (d_x, d_z)$，但**不在原点**。按论文 p4 的定性条件（质心在髋关节附近，且位于气动中立点之前、之下）与 Extended Data Fig. 3d 的支撑多边形条件（质心地面投影落在趾关节与后爪之间），可行域锁定为：
+  * $d_x \in (-0.02,\ 0)$ m —— 质心在髋关节**后方**，但仍在机翼压心 $P_{w,x} = -0.02$ m 之前（只有满足后者才有飞行被动稳定性）；
+  * $d_z \in (0,\ 0.052)$ m —— 质心在髋关节**上方**，但低于气动中立点（0.052 m 为按机翼/尾翼面积加权粗估的中立点高度）。
+  * 论文未给出具体数值，本阶段只锁可行域、**暂不定值**，详见 `doc/missing_params_log.md`。
 
 ### 1.3 坐标变换关系
 
@@ -61,22 +64,25 @@ $$\mathbf{p}_{C}(\mathbf{q}) = \begin{bmatrix} q_1 \\ q_2 \end{bmatrix} + R(q_3)
 
 **髋关节铰点**就是本体系原点，故其世界系位置直接是 $\mathbf{p}_{\text{hip}} = (q_1, q_2)$，不含任何偏移项——这与论文式 (6) 的写法一致。
 
-> 参数状态：$(d_x, d_z)$ 的**数值**论文未给出（Extended Data Table 2 只给质量，未给质心位置），已登记为待确认项；该偏移量会在 Step 3 质量矩阵中引入"质心偏置"的耦合项，未确定前不能开始 Step 3。
+> 参数状态：$(d_x, d_z)$ 的**数值**论文未给出（Extended Data Table 2 只给质量，未给质心位置），现只锁死可行域 $d_x \in (-0.02, 0)$ m、$d_z \in (0, 0.052)$ m，暂不定值（见 `doc/missing_params_log.md`）。该偏移量会在 Step 3 质量矩阵中引入"质心偏置"耦合项，定值前不能开始 Step 3。
+>
+> 注意区分：**气动力作用点** $P_w, P_t$ 也是本体系下的常值坐标（见 `config/robot_paras.yaml` 的 `simulation.reference_points`），但它们与上式无关，不参与坐标变换的推导。
 
 ### 1.4 三个坐标/角度基准的区分（易混点）
 
 | 量 | 参考基准 | 说明 | 对应符号 |
 |---|---|---|---|
-| 机身质心位置 | 世界系 $O$ | 绝对位置 | $q_1, q_2$ |
+| 本体坐标系原点（髋关节）位置 | 世界系 $O$ | 绝对位置，**不是质心位置** | $q_1, q_2$ |
+| 机身质心位置 | 世界系 $O$ | 由 $(q_1,q_2)$ 与本体偏移 $(d_x,d_z)$ 合成，见 §1.3 | $\mathbf{p}_C$ |
 | 机身俯仰角 | 世界系 $+X$ | 机身纵轴 $x_B$ 相对 $+X$ 的转角 | $q_3$ |
 | 关节相对角 | 相邻连杆 | 子连杆相对父连杆的转角 | $q_4, q_5, q_6$ |
 | 连杆绝对倾角 | 世界系 $-Z$（竖直向下） | 各连杆相对竖直向下方向的转角 | $\alpha_1, \alpha_2, \alpha_3$ |
 
 > 注意：$q_3$ 的基准是 $+X$（水平向前），而 $\alpha_i$ 的基准是 $-Z$（竖直向下），两者相差 $90^\circ$；由 §2 中的 $\alpha_1 = q_3 + q_4$ 可知，$q_4$ 是关节相对角而非绝对角。
 
-### 几何常数（均从 `config/robot_paras.yaml` 读取）
+### 几何常数（$l_1, l_2$ 等从 `config/robot_paras.yaml` 读取；$(d_x, d_z)$ 论文未给，见 `doc/missing_params_log.md`）
 
-* $(d_x, d_z)$：髋关节铰点在机身本体坐标系下的固定偏移量。
+* $(d_x, d_z)$：**机身质心 $C$** 在机身本体坐标系下的位置偏移（原点 = 髋关节铰点），可行域见 §1.2；YAML 中**尚无对应键**，暂不参与计算。
 * $l_1$：大腿连杆长度（髋关节到踝关节）。
 * $l_2$：小腿/跗跖骨连杆长度（踝关节到脚趾关节）。
 * $l_3$：脚趾连杆长度（脚趾关节到脚趾尖端触地点）。
@@ -98,9 +104,11 @@ $$\begin{cases} \alpha_1 = q_3 + q_4 \\ \alpha_2 = q_3 + q_4 + q_5 \\ \alpha_3 =
 
 ## 3. 正运动学方程（Forward Kinematics）
 
-### 3.1 髋关节位置 $\mathbf{p}_{\text{hip}}$
+### 3.1 髋关节位置 $\mathbf{p}_{\text{hip}}$（即本体坐标系原点）
 
-$$\mathbf{p}_{\text{hip}}(\mathbf{q}) = \begin{bmatrix} x_{\text{hip}} \\ z_{\text{hip}} \end{bmatrix} = \begin{bmatrix} q_1 + d_x \cos q_3 - d_z \sin q_3 \\ q_2 + d_x \sin q_3 + d_z \cos q_3 \end{bmatrix}$$
+$$\mathbf{p}_{\text{hip}}(\mathbf{q}) = \begin{bmatrix} x_{\text{hip}} \\ z_{\text{hip}} \end{bmatrix} = \begin{bmatrix} q_1 \\ q_2 \end{bmatrix}$$
+
+髋关节就是本体系原点，**不含 $d_x, d_z$ 项**。$d_x, d_z$ 只出现在机身质心 $\mathbf{p}_C$ 的表达式中（§1.3）；足端触地约束 $\mathbf{p}_{\text{tip}}$ 从髋关节出发，与质心位置无关。
 
 ### 3.2 踝关节位置 $\mathbf{p}_{\text{ankle}}$
 
@@ -134,7 +142,9 @@ $$J_{12} = 0, \quad J_{22} = 1$$
 
 * **第 3 列（对 $q_3$ 求导）**：
 
-$$\begin{cases} J_{13} = -d_x \sin q_3 - d_z \cos q_3 + l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 \\ J_{23} = d_x \cos q_3 - d_z \sin q_3 + l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 \end{cases}$$
+$$\begin{cases} J_{13} = l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 \\ J_{23} = l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 \end{cases}$$
+
+> 说明：因为 $\mathbf{p}_{\text{hip}} = (q_1, q_2)$ 与 $q_3$ 无关，机身俯仰只通过各连杆绝对倾角 $\alpha_i$ 影响足端，故第 3 列**不含** $d_x, d_z$ 项。
 
 * **第 4 列（对 $q_4$ 求导）**：
 
@@ -164,7 +174,7 @@ $$\dot{J}_{\text{tip}}(\mathbf{q}, \dot{\mathbf{q}}) = \begin{bmatrix} 0 & 0 & \
 
 * **第 3 列**：
 
-$$\begin{cases} \dot{J}_{13} = (-d_x \cos q_3 + d_z \sin q_3)\dot{q}_3 - l_1 \sin\alpha_1 \dot{\alpha}_1 - l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 \\ \dot{J}_{23} = (-d_x \sin q_3 - d_z \cos q_3)\dot{q}_3 + l_1 \cos\alpha_1 \dot{\alpha}_1 + l_2 \cos\alpha_2 \dot{\alpha}_2 + l_3 \cos\alpha_3 \dot{\alpha}_3 \end{cases}$$
+$$\begin{cases} \dot{J}_{13} = - l_1 \sin\alpha_1 \dot{\alpha}_1 - l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 \\ \dot{J}_{23} = l_1 \cos\alpha_1 \dot{\alpha}_1 + l_2 \cos\alpha_2 \dot{\alpha}_2 + l_3 \cos\alpha_3 \dot{\alpha}_3 \end{cases}$$
 
 * **第 4 列**：
 
