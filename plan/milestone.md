@@ -1,13 +1,13 @@
 > **[SYSTEM SPEC - PRIMARY ACCEPTANCE CRITERIA]**
-> 本文件（`milestones.md`）是本项目的**验收标准主文件（Primary Acceptance Criteria）**。
+> 本文件（`plan/milestone.md`）是本项目的**验收标准主文件（Primary Acceptance Criteria）**。
 > 所有代码模块的功能完整性、物理仿真精度、可视化交付物及测试通过条件均以本文件为准。
 > **执行铁律**：AI Agent 必须严格按照 Step 1 → Step 5 的顺序单步推进；编写任何 `tests/test_stepX.py` 验证脚本时，所有 `assert` 阈值必须严格对齐本文件规定，严禁私自放宽标准或跳过未通过的检验项。
 
 # EPFL RAVEN 跳跃起飞纯数学动力学仿真 — 开发里程碑与验收标准
 
 ## 全局前置约束（Pre-flight Checks）
-- [ ] **参数单一事实来源**：所有物理常数（质量、连杆长度、惯量、弹簧刚度、电机特性、气动参数）必须从 `config/robot_params.yaml` 读取，严禁在代码中硬编码 Magic Numbers。
-- [ ] **缺失参数零脑补**：遇到论文未公开的细节参数，必须记录至 `docs/missing_params_log.md` 并暂停编码等待人工确认，严禁私自编造经验值。
+- [ ] **参数单一事实来源**：所有物理常数（质量、连杆长度、惯量、弹簧刚度、电机特性、气动参数）必须从 `config/robot_paras.yaml` 读取，严禁在代码中硬编码 Magic Numbers。
+- [ ] **缺失参数零脑补**：遇到论文未公开的细节参数，必须记录至 `doc/missing_params_log.md` 并暂停编码等待人工确认，严禁私自编造经验值。
 - [ ] **纯粹数学求解栈**：仅使用 `NumPy`、`SciPy` (`solve_ivp`) 和 `Matplotlib`，不引入外部物理引擎。
 
 ---
@@ -15,9 +15,9 @@
 ## Step 1：几何与运动学模型（正运动学与雅可比矩阵）
 - **目标**：建立矢状面（\(x\text{-}z\) 平面）浮基机身与腿部多连杆（髋、膝/踝、脚趾）的正运动学及解析雅可比矩阵。
 - **交付物**：
-  - [ ] 核心代码：`src/kinematics.py`
-  - [ ] 验收脚本：`tests/test_step1.py`
-  - [ ] 校验图表：`output/step1_kinematics_check.png`
+  - [x] 核心代码：`src/kinematics.py`
+  - [x] 验收脚本：`tests/test_step1.py`
+  - [x] 校验图表：`output/step1_kinematics_check.png`
 - **硬性验收标准（Acceptance Criteria）**：
   1. **静态几何解析校验**：输入特殊测试关节角（如腿部完全伸直 \(q=0\)、直角折叠 \(q=\pi/2\)），函数输出的足端坐标 \(\mathbf{p}_{\text{foot}}\) 与手工三角函数解析解的绝对误差 **`< 1e-12 m`**。
   2. **雅可比数值微分自检**：在 50 组随机关节姿态 \(\mathbf{q}\) 下，对比解析雅可比矩阵 \(J_{\text{leg}}(\mathbf{q})\) 与中心有限差分结果（\(\Delta q = 10^{-7}\)），最大元素绝对误差 **`< 1e-6`**。
@@ -64,7 +64,7 @@
 ---
 
 ## Step 5：论文基准指标对齐与完整可视化报告
-- **目标**：运行完整工况仿真，对齐 EPFL *Nature* 论文实验基准数据，生成全套分析图表与频闪动画。
+- **目标**：运行完整工况仿真，对齐 EPFL *Science Robotics* 论文实验基准数据，生成全套分析图表与频闪动画。
 - **交付物**：
   - [ ] 主运行脚本：`main_benchmark.py`
   - [ ] 验收脚本：`tests/test_step5.py`
