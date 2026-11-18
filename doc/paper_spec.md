@@ -65,22 +65,32 @@ $$\mathbf{q} = \begin{bmatrix} q_1 & q_2 & q_3 & q_4 & q_5 & q_6 \end{bmatrix}^T
 ### 2.2 连杆绝对倾角 $\alpha_i$
 定义各连杆相对惯性世界坐标系 $+X$ 轴（水平向前）的逆时针绝对转角 $\alpha_i$。由串联链逐级叠加展开：
 
-$$\begin{cases}
-\alpha_1 = q_3 + q_4 & \text{（上肢 } l_1 \text{ 绝对倾角）} \\
-\alpha_2 = \alpha_1 + q_5 = q_3 + q_4 + q_5 & \text{（下肢 } l_2 \text{ 绝对倾角）} \\
-\alpha_3 = \alpha_2 + \theta_3 = q_3 + q_4 + q_5 + \theta_3 & \text{（偏移杆 } l_3 \text{ 绝对倾角，含固定角 } \theta_3\text{）} \\
-\alpha_4 = \alpha_3 + q_6 = q_3 + q_4 + q_5 + \theta_3 + q_6 & \text{（脚趾 } l_4 \text{ 绝对倾角）}
-\end{cases}$$
+$$
+\begin{aligned}
+\alpha_1 &= q_3 + q_4 \\
+\alpha_2 &= \alpha_1 + q_5 = q_3 + q_4 + q_5 \\
+\alpha_3 &= \alpha_2 + \theta_3 = q_3 + q_4 + q_5 + \theta_3 \\
+\alpha_4 &= \alpha_3 + q_6 = q_3 + q_4 + q_5 + \theta_3 + q_6
+\end{aligned}
+$$
+
+各式含义：
+* $\alpha_1$：上肢 $l_1$ 的绝对倾角
+* $\alpha_2$：下肢 $l_2$ 的绝对倾角
+* $\alpha_3$：偏移杆 $l_3$ 的绝对倾角（含固定角 $\theta_3$）
+* $\alpha_4$：脚趾 $l_4$ 的绝对倾角
 
 ### 2.3 绝对角速度传递关系
 对绝对倾角求时间导数，因 $\theta_3$ 为几何固定常数（$\dot{\theta}_3 = 0$），得到角速度传递关系：
 
-$$\begin{cases}
-\dot{\alpha}_1 = \dot{q}_3 + \dot{q}_4 \\
-\dot{\alpha}_2 = \dot{q}_3 + \dot{q}_4 + \dot{q}_5 \\
-\dot{\alpha}_3 = \dot{\alpha}_2 = \dot{q}_3 + \dot{q}_4 + \dot{q}_5 \\
-\dot{\alpha}_4 = \dot{\alpha}_3 + \dot{q}_6 = \dot{q}_3 + \dot{q}_4 + \dot{q}_5 + \dot{q}_6
-\end{cases}$$
+$$
+\begin{aligned}
+\dot{\alpha}_1 &= \dot{q}_3 + \dot{q}_4 \\
+\dot{\alpha}_2 &= \dot{q}_3 + \dot{q}_4 + \dot{q}_5 \\
+\dot{\alpha}_3 &= \dot{\alpha}_2 = \dot{q}_3 + \dot{q}_4 + \dot{q}_5 \\
+\dot{\alpha}_4 &= \dot{\alpha}_3 + \dot{q}_6 = \dot{q}_3 + \dot{q}_4 + \dot{q}_5 + \dot{q}_6
+\end{aligned}
+$$
 
 ---
 
@@ -104,22 +114,26 @@ $$\mathbf{p}_{\text{tip}}(\mathbf{q}) \equiv \mathbf{p}_{\text{claw}}(\mathbf{q}
 
 显式展开为绝对倾角求和形式：
 
-$$\begin{cases}
-x_{\text{tip}}(\mathbf{q}) = q_1 + l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4 \\
-z_{\text{tip}}(\mathbf{q}) = q_2 + l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4
-\end{cases}$$
+$$
+\begin{aligned}
+x_{\text{tip}}(\mathbf{q}) &= q_1 + l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4 \\
+z_{\text{tip}}(\mathbf{q}) &= q_2 + l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4
+\end{aligned}
+$$
 
 ### 3.3 各构件质心（CoM）位置方程
 用于后续 Step 3 动能与重力势能推导：
 1. **机身质心 $\mathbf{p}_C$**（本体偏移 $(d_x, d_z)$ 满足可行域 $d_x \in (-0.02, 0)\ \text{m}, d_z \in (0, 0.052)\ \text{m}$，详见 §1.3）：
    $$\mathbf{p}_C(\mathbf{q}) = \begin{bmatrix} q_1 \\ q_2 \end{bmatrix} + R(q_3)\begin{bmatrix} d_x \\ d_z \end{bmatrix} = \begin{bmatrix} q_1 + d_x \cos q_3 - d_z \sin q_3 \\ q_2 + d_x \sin q_3 + d_z \cos q_3 \end{bmatrix}$$
 2. **各腿杆质心 $\mathbf{p}_{ci}$**（设质心距各自近端铰点为 $c_i$）：
-   $$\begin{cases}
-   \mathbf{p}_{c1} = \mathbf{p}_1 + R(\alpha_1)[c_1, 0]^T = \begin{bmatrix} q_1 + c_1 \cos\alpha_1 \\ q_2 + c_1 \sin\alpha_1 \end{bmatrix} \\
-   \mathbf{p}_{c2} = \mathbf{p}_2 + R(\alpha_2)[c_2, 0]^T = \begin{bmatrix} x_{\text{ankle}} + c_2 \cos\alpha_2 \\ z_{\text{ankle}} + c_2 \sin\alpha_2 \end{bmatrix} \\
-   \mathbf{p}_{c3} = \mathbf{p}_3 + R(\alpha_3)[c_3, 0]^T = \begin{bmatrix} x_{\text{base}} + c_3 \cos\alpha_3 \\ z_{\text{base}} + c_3 \sin\alpha_3 \end{bmatrix} \\
-   \mathbf{p}_{c4} = \mathbf{p}_4 + R(\alpha_4)[c_4, 0]^T = \begin{bmatrix} x_{\text{toe}} + c_4 \cos\alpha_4 \\ z_{\text{toe}} + c_4 \sin\alpha_4 \end{bmatrix}
-   \end{cases}$$
+   $$
+   \begin{aligned}
+   \mathbf{p}_{c1} &= \mathbf{p}_1 + R(\alpha_1)[c_1, 0]^T = \begin{bmatrix} q_1 + c_1 \cos\alpha_1 \\ q_2 + c_1 \sin\alpha_1 \end{bmatrix} \\
+   \mathbf{p}_{c2} &= \mathbf{p}_2 + R(\alpha_2)[c_2, 0]^T = \begin{bmatrix} x_{\text{ankle}} + c_2 \cos\alpha_2 \\ z_{\text{ankle}} + c_2 \sin\alpha_2 \end{bmatrix} \\
+   \mathbf{p}_{c3} &= \mathbf{p}_3 + R(\alpha_3)[c_3, 0]^T = \begin{bmatrix} x_{\text{base}} + c_3 \cos\alpha_3 \\ z_{\text{base}} + c_3 \sin\alpha_3 \end{bmatrix} \\
+   \mathbf{p}_{c4} &= \mathbf{p}_4 + R(\alpha_4)[c_4, 0]^T = \begin{bmatrix} x_{\text{toe}} + c_4 \cos\alpha_4 \\ z_{\text{toe}} + c_4 \sin\alpha_4 \end{bmatrix}
+   \end{aligned}
+   $$
 
 ---
 
@@ -148,20 +162,26 @@ $$J_{2j} = \frac{\partial z_{\text{tip}}}{\partial q_j} = \frac{\partial q_2}{\p
 * **第 1、2 列（$q_1, q_2$ 浮基平动）**：
   $$\begin{bmatrix} J_{11} & J_{12} \\ J_{21} & J_{22} \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$$
 * **第 3、4 列（$q_3$ 俯仰角，与 $q_4$ 髋关节角等效）**：
-  $$\begin{cases}
-  J_{13} = J_{14} = -(l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4) \\
-  J_{23} = J_{24} = l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  J_{13} = J_{14} &= -(l_1 \sin\alpha_1 + l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4) \\
+  J_{23} = J_{24} &= l_1 \cos\alpha_1 + l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4
+  \end{aligned}
+  $$
 * **第 5 列（$q_5$ 踝关节角）**：
-  $$\begin{cases}
-  J_{15} = -(l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4) \\
-  J_{25} = l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  J_{15} &= -(l_2 \sin\alpha_2 + l_3 \sin\alpha_3 + l_4 \sin\alpha_4) \\
+  J_{25} &= l_2 \cos\alpha_2 + l_3 \cos\alpha_3 + l_4 \cos\alpha_4
+  \end{aligned}
+  $$
 * **第 6 列（$q_6$ 趾关节角）**：
-  $$\begin{cases}
-  J_{16} = -l_4 \sin\alpha_4 \\
-  J_{26} = l_4 \cos\alpha_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  J_{16} &= -l_4 \sin\alpha_4 \\
+  J_{26} &= l_4 \cos\alpha_4
+  \end{aligned}
+  $$
 
 ### 4.3 趾关节雅可比矩阵 $J_{\text{toe}}(\mathbf{q}) \in \mathbb{R}^{2 \times 6}$
 趾关节 $\mathbf{p}_{\text{toe}}$ 不受脚趾偏转角 $q_6$ 影响，故其第 6 列恒为 0，前 5 列为 $J_{\text{tip}}$ 中去除 $l_4$ 项的结果：
@@ -186,20 +206,26 @@ $$\dot{J}_{\text{tip}}(\mathbf{q}, \dot{\mathbf{q}}) = \begin{bmatrix} 0 & 0 & \
 
 前两列因常数求导严格为 0，其余非零元素解析式如下：
 * **第 3、4 列**（$\dot{J}_{13} = \dot{J}_{14}, \dot{J}_{23} = \dot{J}_{24}$）：
-  $$\begin{cases}
-  \dot{J}_{13} = -l_1 \cos\alpha_1 \dot{\alpha}_1 - l_2 \cos\alpha_2 \dot{\alpha}_2 - l_3 \cos\alpha_3 \dot{\alpha}_3 - l_4 \cos\alpha_4 \dot{\alpha}_4 \\
-  \dot{J}_{23} = -l_1 \sin\alpha_1 \dot{\alpha}_1 - l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 - l_4 \sin\alpha_4 \dot{\alpha}_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  \dot{J}_{13} &= -l_1 \cos\alpha_1 \dot{\alpha}_1 - l_2 \cos\alpha_2 \dot{\alpha}_2 - l_3 \cos\alpha_3 \dot{\alpha}_3 - l_4 \cos\alpha_4 \dot{\alpha}_4 \\
+  \dot{J}_{23} &= -l_1 \sin\alpha_1 \dot{\alpha}_1 - l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 - l_4 \sin\alpha_4 \dot{\alpha}_4
+  \end{aligned}
+  $$
 * **第 5 列**：
-  $$\begin{cases}
-  \dot{J}_{15} = -l_2 \cos\alpha_2 \dot{\alpha}_2 - l_3 \cos\alpha_3 \dot{\alpha}_3 - l_4 \cos\alpha_4 \dot{\alpha}_4 \\
-  \dot{J}_{25} = -l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 - l_4 \sin\alpha_4 \dot{\alpha}_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  \dot{J}_{15} &= -l_2 \cos\alpha_2 \dot{\alpha}_2 - l_3 \cos\alpha_3 \dot{\alpha}_3 - l_4 \cos\alpha_4 \dot{\alpha}_4 \\
+  \dot{J}_{25} &= -l_2 \sin\alpha_2 \dot{\alpha}_2 - l_3 \sin\alpha_3 \dot{\alpha}_3 - l_4 \sin\alpha_4 \dot{\alpha}_4
+  \end{aligned}
+  $$
 * **第 6 列**：
-  $$\begin{cases}
-  \dot{J}_{16} = -l_4 \cos\alpha_4 \dot{\alpha}_4 \\
-  \dot{J}_{26} = -l_4 \sin\alpha_4 \dot{\alpha}_4
-  \end{cases}$$
+  $$
+  \begin{aligned}
+  \dot{J}_{16} &= -l_4 \cos\alpha_4 \dot{\alpha}_4 \\
+  \dot{J}_{26} &= -l_4 \sin\alpha_4 \dot{\alpha}_4
+  \end{aligned}
+  $$
 
 （同理，$\dot{J}_{\text{toe}}$ 为 $\dot{J}_{\text{tip}}$ 中令 $l_4 = 0$ 的结果。）
 
@@ -270,5 +296,5 @@ $$\mathbf{M}(\mathbf{q})\ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{
 | **Step 1** | 坐标系、正运动学、解析雅可比及导数（式 (2)–(9)） | `src/kinematics.py` | `forward_kinematics_tip`（误差 $<10^{-12}\ \text{m}$）、`jacobian_tip`（误差 $<10^{-6}$）、`jacobian_dot_tip`（误差 $<10^{-5}$） |
 | **Step 2** | 踝/趾关节扭簧与电机外特性（式 (11) 驱动项） | `src/actuators.py` | 单向扭簧释放过零截断（$>q_0$ 严格为 $0$）、电机堵转与空载转速边界 |
 | **Step 3** | 拉格朗日动力学 $\mathbf{M}, \mathbf{C}, \mathbf{g}$ 与 KKT 接触求解（式 (10), (23)） | `src/dynamics.py` | $\mathbf{M}(\mathbf{q})$ 对称正定、KKT 接触加速度残差 $<10^{-10}\ \text{m/s}^2$、无外力机械能守恒误差 $<0.1\%$ |
-| **Step 4** | 优先级控制、QR 扭矩反解与状态机切换（式 (12)–(22)） | `src/simulator.py` | `solve_ivp` 事件触发离地检测（$|F_z| < 10^{-4}\ \text{N}$）、状态连续性 |
+| **Step 4** | 优先级控制、QR 扭矩反解与状态机切换（式 (12)–(22)） | `src/simulator.py` | `solve_ivp` 事件触发离地检测（$\lvert F_z \rvert < 10^{-4}\ \text{N}$）、状态连续性 |
 | **Step 5** | 跳跃起飞全流程仿真与论文基准对比 | `main_benchmark.py` | 起飞时间、起飞速度（约 $2.4\sim 2.5\ \text{m/s}$）、质心轨迹与关节力矩曲线复现 |

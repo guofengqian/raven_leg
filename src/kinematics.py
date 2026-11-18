@@ -45,42 +45,29 @@ import numpy as np
 def load_kinematics_params(config_path: str = None) -> Dict[str, float]:
     """
     【功能】：从 YAML 配置文件中加载机器人机构的几何尺寸参数。
-    
-    【设计原则 - 零脑补与单一事实来源】：
-    在专业工程与科研中，严禁在算法代码里硬编码诸如 0.12, 0.06 这样的数字（称为 Magic Numbers）。
-    所有物理常数必须统一从 config/robot_paras.yaml 集中读取。如果将来硬件改版调整了连杆长度，
-    只需改 YAML 文件，这里的所有运动学方程自动保持正确。
-
-    【参数解析】：
-    - config_path: yaml 文件路径。如果为空，自动寻找项目标准路径 config/robot_paras.yaml。
-
-    【返回值】：
-    包含各杆件长度与角度的字典：
-    - l1: 上肢（大腿）长度，单位：米
-    - l2: 下肢（小腿/跗跖骨）长度，单位：米
-    - l3: 趾关节偏移杆长度，单位：米
-    - l4: 脚趾长度，单位：米
-    - theta3: 趾关节机械固定偏移角度，已转换为【弧度制 (rad)】
-    - body_length: 机身参考长度，单位：米
     """
     if config_path is None:
-        # 自动获取当前脚本所在的绝对目录，并回退一级找到 config 目录
-        curr_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.abspath(os.path.join(curr_dir, "..", "config", "robot_paras.yaml"))
+        # curr_dir: 当前代码文件 (kinematics.py) 所在的本地绝对目录 (字符串)
+        curr_dir: str = os.path.dirname(os.path.abspath(__file__))
+        # config_path: 拼接出 config/robot_paras.yaml 配置文件的绝对路径 (字符串)
+        config_path: str = os.path.abspath(os.path.join(curr_dir, "..", "config", "robot_paras.yaml"))
 
     # 以只读 UTF-8 编码安全读取 yaml 文件
     with open(config_path, "r", encoding="utf-8") as f:
-        cfg = yaml.safe_load(f)
+        # cfg: 通过 YAML 解析器读入的完整嵌套字典，存储了所有硬件与仿真参数
+        cfg: dict = yaml.safe_load(f)
 
-    # 提取 simulation -> geometry 节点下的几何数据
-    geom = cfg["simulation"]["geometry"]
-    params = {
-        "l1": float(geom["l1_m"]),                       # 论文 Table 2: 0.12 m
-        "l2": float(geom["l2_m"]),                       # 论文 Table 2: 0.12 m
-        "l3": float(geom["l3_m"]),                       # 论文 Table 2: 0.023 m
-        "l4": float(geom["l4_m"]),                       # 论文 Table 2: 0.06 m
-        "theta3": float(np.deg2rad(geom["theta3_deg"])), # 论文 Table 2: 45° -> 转换成弧度 π/4
-        "body_length": float(geom["body_length_m"]),     # 论文 Table 2: 0.5 m
+    # geom: 从配置中提取出的仿真几何参数子字典 (包含杆长、角度等)
+    geom: dict = cfg["simulation"]["geometry"]
+
+    # params: 规范化整理后的物理几何参数字典，全部转换为标准 SI 单位（米、弧度）
+    params: Dict[str, float] = {
+        "l1": float(geom["l1_m"]),                       # l1: 上肢（大腿）长度，单位：米 (0.12 m)
+        "l2": float(geom["l2_m"]),                       # l2: 下肢（小腿/跗跖骨）长度，单位：米 (0.12 m)
+        "l3": float(geom["l3_m"]),                       # l3: 趾关节偏移杆长度，单位：米 (0.023 m)
+        "l4": float(geom["l4_m"]),                       # l4: 脚趾连杆长度，单位：米 (0.06 m)
+        "theta3": float(np.deg2rad(geom["theta3_deg"])), # theta3: 趾关节结构固定安装角，45° 转换为弧度 (0.7854 rad)
+        "body_length": float(geom["body_length_m"]),     # body_length: 机身全长参考值，单位：米 (0.5 m)
     }
     return params
 
@@ -89,33 +76,31 @@ def compute_absolute_angles(q: np.ndarray, theta3: float) -> Tuple[float, float,
     """
     【功能】：计算腿部 4 根连杆相对世界坐标系 +X 轴（水平正前方）的绝对姿态角 alpha_1 ~ alpha_4。
 
-    【小白数学原理解析】：
-    - 相对角 vs 绝对角：
-      * 传感器或电机编码器测出的是“关节相对角”（比如大腿相对于机身转了多少度）；
-      * 但要算出脚尖在地球（惯性系）上的空间位置，必须知道每根杆件相对于地面水平轴的“绝对倾角”！
-    - 级联求和原理（串联机械臂的逐级姿态叠加）：
-      * 连杆 1（大腿 l1）：自身转了 q4，但基座（机身）已经抬头转了 q3，
-        所以绝对倾角 alpha1 = q3 + q4。
-      * 连杆 2（小腿 l2）：在上肢倾角 alpha1 的基础上，膝/踝关节相对弯折了 q5，
-        所以绝对倾角 alpha2 = alpha1 + q5 = q3 + q4 + q5。
-      * 连杆 3（趾关节偏移杆 l3）：小腿末端装有一个固定 45° (theta3) 的刚性偏转座（注意这是结构常数，不是活动关节），
-        所以绝对倾角 alpha3 = alpha2 + theta3 = q3 + q4 + q5 + theta3。
-      * 连杆 4（脚趾 l4）：脚趾在趾关节处受被动弹簧约束偏转了 q6，
-        所以绝对倾角 alpha4 = alpha3 + q6 = q3 + q4 + q5 + theta3 + q6。
-
-    【输入】：
-    - q: 6 维广义坐标向量 [q1, q2, q3, q4, q5, q6]^T
-    - theta3: 固定的趾关节偏移角（弧度）
-
-    【输出】：
-    - (alpha1, alpha2, alpha3, alpha4): 四根连杆的绝对倾角（弧度）
+    【输入变量说明】：
+    - q: 6 维广义坐标向量，类型为 numpy 数组，包含 [q1, q2, q3, q4, q5, q6]
+    - theta3: 固定的趾关节偏移角（单位：弧度）
     """
-    q3, q4, q5, q6 = q[2], q[3], q[4], q[5]
+    # 从广义坐标数组 q 中提取出各转动自由度：
+    q3: float = q[2]  # q3: 机身纵轴相对世界水平 +X 轴的俯仰角 (弧度，抬头为正)
+    q4: float = q[3]  # q4: 髋关节相对角，即大腿连杆相对机身纵轴的转角 (弧度)
+    q5: float = q[4]  # q5: 踝关节相对角，即小腿连杆相对大腿连杆的转角 (弧度)
+    q6: float = q[5]  # q6: 趾关节相对角，即脚趾连杆相对偏移杆的偏转角 (弧度)
 
-    alpha1 = q3 + q4
-    alpha2 = alpha1 + q5
-    alpha3 = alpha2 + theta3
-    alpha4 = alpha3 + q6
+    # alpha1: 上肢（大腿 l1）相对世界水平 +X 轴的绝对倾角 (弧度)
+    # 机身抬头 q3，大腿又相对机身转了 q4，因此两角直接相加
+    alpha1: float = q3 + q4
+
+    # alpha2: 下肢（小腿 l2）相对世界水平 +X 轴的绝对倾角 (弧度)
+    # 在大腿绝对角 alpha1 的基础上，膝/踝关节相对弯折了 q5
+    alpha2: float = alpha1 + q5
+
+    # alpha3: 趾关节偏移杆（l3）相对世界水平 +X 轴的绝对倾角 (弧度)
+    # 在小腿绝对角 alpha2 的基础上，叠加机械固定的安装偏角 theta3 (45°)
+    alpha3: float = alpha2 + theta3
+
+    # alpha4: 脚趾连杆（l4）相对世界水平 +X 轴的绝对倾角 (弧度)
+    # 在偏移杆绝对角 alpha3 的基础上，叠加脚趾弹簧的偏转角 q6
+    alpha4: float = alpha3 + q6
 
     return alpha1, alpha2, alpha3, alpha4
 
@@ -124,26 +109,27 @@ def compute_absolute_angle_rates(q_dot: np.ndarray) -> Tuple[float, float, float
     """
     【功能】：计算 4 根连杆绝对倾角的时间变化率（即绝对角速度 d_alpha / dt）。
 
-    【小白微积分原理解析】：
-    对上面的绝对角求时间导数 d/dt：
-    - d(alpha1)/dt = q3_dot + q4_dot
-    - d(alpha2)/dt = q3_dot + q4_dot + q5_dot
-    - d(alpha3)/dt = d(alpha2 + theta3)/dt = alpha2_dot + 0 = alpha2_dot
-      （★特别注意：因为 theta3 是机械加工固定的常数角 45°，它的时间导数严格为 0！）
-    - d(alpha4)/dt = alpha3_dot + q6_dot = q3_dot + q4_dot + q5_dot + q6_dot
-
-    【输入】：
-    - q_dot: 6 维广义速度向量 [q1_dot, q2_dot, q3_dot, q4_dot, q5_dot, q6_dot]^T
-
-    【输出】：
-    - (alpha1_dot, alpha2_dot, alpha3_dot, alpha4_dot): 4 个绝对角速度 (rad/s)
+    【输入变量说明】：
+    - q_dot: 6 维广义速度向量 [q1_dot, q2_dot, q3_dot, q4_dot, q5_dot, q6_dot]
     """
-    q3_dot, q4_dot, q5_dot, q6_dot = q_dot[2], q_dot[3], q_dot[4], q_dot[5]
+    # 从广义速度数组 q_dot 中提取出各转动自由度的一阶时间导数（角速度）：
+    q3_dot: float = q_dot[2]  # q3_dot: 机身俯仰角速度 (rad/s)
+    q4_dot: float = q_dot[3]  # q4_dot: 髋关节电机旋转角速度 (rad/s)
+    q5_dot: float = q_dot[4]  # q5_dot: 踝关节电机旋转角速度 (rad/s)
+    q6_dot: float = q_dot[5]  # q6_dot: 脚趾关节偏转角速度 (rad/s)
 
-    alpha1_dot = q3_dot + q4_dot
-    alpha2_dot = alpha1_dot + q5_dot
-    alpha3_dot = alpha2_dot               # 固定角无角速度贡献
-    alpha4_dot = alpha3_dot + q6_dot
+    # alpha1_dot: 上肢（大腿 l1）绕垂直纸面轴的绝对角速度 (rad/s)
+    alpha1_dot: float = q3_dot + q4_dot
+
+    # alpha2_dot: 下肢（小腿 l2）绕垂直纸面轴的绝对角速度 (rad/s)
+    alpha2_dot: float = alpha1_dot + q5_dot
+
+    # alpha3_dot: 趾关节偏移杆（l3）的绝对角速度 (rad/s)
+    # ★重要：因为固定角 theta3 是常数 (d(theta3)/dt = 0)，所以偏移杆角速度等于小腿角速度
+    alpha3_dot: float = alpha2_dot
+
+    # alpha4_dot: 脚趾连杆（l4）的绝对角速度 (rad/s)
+    alpha4_dot: float = alpha3_dot + q6_dot
 
     return alpha1_dot, alpha2_dot, alpha3_dot, alpha4_dot
 
@@ -151,60 +137,53 @@ def compute_absolute_angle_rates(q_dot: np.ndarray) -> Tuple[float, float, float
 def forward_kinematics_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：正向运动学函数 —— 计算足端爪尖 (p_claw / p_tip) 在世界坐标系下的绝对坐标。
-    
-    【论文对应公式】：
-    对应论文 Methods 第 14 页式 (7):
-    p_claw = p_toe + R(alpha4) * [l4, 0]^T
-
-    【几何直观推导】：
-    脚尖的最终坐标，就是从髋关节起点出发，沿每一截连杆的投影向量一路“头尾相接累加”：
-    - X 方向总位置 = 髋关节水平起点 q1 + 各连杆沿水平方向的余弦投影累加：
-      X_tip = q1 + l1*cos(alpha1) + l2*cos(alpha2) + l3*cos(alpha3) + l4*cos(alpha4)
-    - Z 方向总位置 = 髋关节垂直起点 q2 + 各连杆沿竖直方向的正弦投影累加：
-      Z_tip = q2 + l1*sin(alpha1) + l2*sin(alpha2) + l3*sin(alpha3) + l4*sin(alpha4)
-
-    【输入】：
-    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]^T
-    - params: 包含 l1~l4 与 theta3 的参数字典
-
-    【输出】：
-    - 一维数组 [x_tip, z_tip]，单位：米
     """
-    q1, q2 = q[0], q[1]
-    l1, l2, l3, l4 = params["l1"], params["l2"], params["l3"], params["l4"]
-    theta3 = params["theta3"]
+    # q1, q2: 左右两髋关节连线中点在世界惯性系下的绝对坐标 (X_hip, Z_hip)，单位：米
+    q1: float = q[0]
+    q2: float = q[1]
 
-    # 1. 算出 4 根杆件当前的绝对朝向角
+    # 从参数字典中解包各个连杆长度与固定偏移角：
+    l1: float = params["l1"]          # 大腿连杆长度 (米)
+    l2: float = params["l2"]          # 小腿连杆长度 (米)
+    l3: float = params["l3"]          # 偏移杆长度 (米)
+    l4: float = params["l4"]          # 脚趾连杆长度 (米)
+    theta3: float = params["theta3"]  # 趾关节固定偏角 (弧度)
+
+    # a1, a2, a3, a4: 4 根刚性连杆当前的绝对朝向角 (弧度)
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
 
-    # 2. 几何投影逐段累加求和
-    x_tip = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3) + l4 * np.cos(a4)
-    z_tip = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3) + l4 * np.sin(a4)
+    # x_tip: 足端爪尖在世界坐标系下的水平位置 X (米)
+    # 物理意义：基点水平位置 q1 + 各连杆水平投影 (l * cos(angle)) 依次累加
+    x_tip: float = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3) + l4 * np.cos(a4)
 
+    # z_tip: 足端爪尖在世界坐标系下的垂直高度 Z (米)
+    # 物理意义：基点垂直高度 q2 + 各连杆垂直投影 (l * sin(angle)) 依次累加
+    z_tip: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3) + l4 * np.sin(a4)
+
+    # 返回足端二维空间位置向量 [X_tip, Z_tip]^T
     return np.array([x_tip, z_tip], dtype=np.float64)
 
 
 def forward_kinematics_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：正向运动学函数 —— 计算趾关节旋转中心 (p_toe / J4) 在世界坐标系下的绝对坐标。
-
-    【论文对应公式】：
-    对应论文 Methods 第 14 页式 (6):
-    p_toe = [q1, q2]^T + R(alpha1)*[l1, 0]^T + R(alpha2)*[l2, 0]^T + R(alpha3)*[l3, 0]^T
-
-    【为什么单独需要这个函数？】：
-    在全足触地蹬伸阶段（论文式 5），趾关节也是贴地的接触点。为了施加全足约束方程，
-    必须单独提取出趾关节的坐标与雅可比矩阵。
-    它与 foot_tip 的区别在于：它只累加到偏移杆 l3，尚未计入末端脚趾连杆 l4。
     """
-    q1, q2 = q[0], q[1]
-    l1, l2, l3 = params["l1"], params["l2"], params["l3"]
-    theta3 = params["theta3"]
+    q1: float = q[0]  # 髋关节连线中点水平坐标 X (米)
+    q2: float = q[1]  # 髋关节连线中点垂直坐标 Z (米)
 
+    l1: float = params["l1"]          # 大腿长 (米)
+    l2: float = params["l2"]          # 小腿长 (米)
+    l3: float = params["l3"]          # 偏移杆长 (米)
+    theta3: float = params["theta3"]  # 趾关节固定偏角 (弧度)
+
+    # 计算前 3 截连杆的绝对角（趾关节尚未经过脚趾连杆 l4，故不需要 a4）
     a1, a2, a3, _ = compute_absolute_angles(q, theta3)
 
-    x_toe = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3)
-    z_toe = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3)
+    # x_toe: 趾关节在世界坐标系下的水平坐标 X (米)
+    x_toe: float = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3)
+
+    # z_toe: 趾关节在世界坐标系下的垂直坐标 Z (米)
+    z_toe: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3)
 
     return np.array([x_toe, z_toe], dtype=np.float64)
 
@@ -213,42 +192,51 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
                                   dx: float = None, dz: float = None) -> Dict[str, np.ndarray]:
     """
     【功能】：正向运动学调试与绘图利器 —— 计算机器人身体所有关键骨架点的坐标。
-    
-    【输出字典包含各个关键点】：
-    - "hip": 髋关节 J1 [q1, q2]，它是整个腿部链条的根原点
-    - "ankle": 踝关节 J2，位于上肢 l1 末端
-    - "base": 跗跖骨末端 J3，位于下肢 l2 末端、偏移杆根部
-    - "toe": 趾关节 J4，位于偏移杆 l3 末端，脚趾旋转轴
-    - "tip": 足端爪尖，脚趾 l4 末端，与地面相互作用的最前端
-    - "nose": 示意机头位置
-    - "tail": 示意机尾位置
-    - "com_body": 机身质心位置（如果传入了质心相对髋关节的偏移 dx, dz）
     """
-    q1, q2 = q[0], q[1]
-    q3 = q[2]
-    l1, l2, l3, l4 = params["l1"], params["l2"], params["l3"], params["l4"]
-    body_length = params.get("body_length", 0.5)
-    theta3 = params["theta3"]
+    q1: float = q[0]  # 髋关节中点 X 位置 (米)
+    q2: float = q[1]  # 髋关节中点 Z 位置 (米)
+    q3: float = q[2]  # 机身俯仰角 (弧度)
 
+    l1: float = params["l1"]                     # 大腿长 (米)
+    l2: float = params["l2"]                     # 小腿长 (米)
+    l3: float = params["l3"]                     # 偏移杆长 (米)
+    l4: float = params["l4"]                     # 脚趾长 (米)
+    body_length: float = params.get("body_length", 0.5)  # 机身基准长度 (米)
+    theta3: float = params["theta3"]             # 趾关节固定角 (弧度)
+
+    # a1~a4: 腿部 4 根连杆的绝对倾角 (弧度)
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
 
-    # 1. 腿链上的骨架连接点
-    p_hip = np.array([q1, q2], dtype=np.float64)
-    p_ankle = p_hip + np.array([l1 * np.cos(a1), l1 * np.sin(a1)])
-    p_base = p_ankle + np.array([l2 * np.cos(a2), l2 * np.sin(a2)])
-    p_toe = p_base + np.array([l3 * np.cos(a3), l3 * np.sin(a3)])
-    p_tip = p_toe + np.array([l4 * np.cos(a4), l4 * np.sin(a4)])
+    # p_hip: J1 髋关节世界坐标 [X, Z]，是腿部连杆链条的根原点
+    p_hip: np.ndarray = np.array([q1, q2], dtype=np.float64)
 
-    # 2. 机身轮廓线估算（以髋关节为基准，按机身俯仰角 q3 进行平面旋转变换）
-    # R(q3) 是 2x2 旋转矩阵
-    cos3, sin3 = np.cos(q3), np.sin(q3)
-    R_b = np.array([[cos3, -sin3], [sin3, cos3]])
+    # p_ankle: J2 踝关节世界坐标，位于大腿 l1 远端
+    p_ankle: np.ndarray = p_hip + np.array([l1 * np.cos(a1), l1 * np.sin(a1)])
+
+    # p_base: J3 小腿末端基点世界坐标，位于小腿 l2 远端
+    p_base: np.ndarray = p_ankle + np.array([l2 * np.cos(a2), l2 * np.sin(a2)])
+
+    # p_toe: J4 趾关节世界坐标，位于偏移杆 l3 远端，是脚趾偏转轴心
+    p_toe: np.ndarray = p_base + np.array([l3 * np.cos(a3), l3 * np.sin(a3)])
+
+    # p_tip: 足端爪尖触地点世界坐标，位于脚趾 l4 末端
+    p_tip: np.ndarray = p_toe + np.array([l4 * np.cos(a4), l4 * np.sin(a4)])
+
+    # cos3, sin3: 机身俯仰角的三角函数值
+    cos3: float = np.cos(q3)
+    sin3: float = np.sin(q3)
+
+    # R_b: 机身本体系到世界惯性坐标系的二维旋转变换矩阵 (2x2)
+    R_b: np.ndarray = np.array([[cos3, -sin3], [sin3, cos3]])
     
-    # 假设机头向前延伸 30% 长度，尾巴向后延伸 70% 长度
-    p_nose = p_hip + R_b @ np.array([body_length * 0.3, 0.0])
-    p_tail = p_hip + R_b @ np.array([-body_length * 0.7, 0.0])
+    # p_nose: 示意机头在世界系中的坐标 (假设从髋关节沿机身中轴向前 30% 机身长)
+    p_nose: np.ndarray = p_hip + R_b @ np.array([body_length * 0.3, 0.0])
 
-    joints = {
+    # p_tail: 示意机尾在世界系中的坐标 (假设从髋关节沿机身中轴向后 70% 机身长)
+    p_tail: np.ndarray = p_hip + R_b @ np.array([-body_length * 0.7, 0.0])
+
+    # joints: 汇总存储所有关键骨架关节位置的字典
+    joints: Dict[str, np.ndarray] = {
         "hip": p_hip,
         "ankle": p_ankle,
         "base": p_base,
@@ -258,9 +246,10 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
         "tail": p_tail,
     }
 
-    # 3. 机身质心计算：机身质心坐标 = 髋关节坐标 + R(q3) * 质心在本体系的偏移量 [dx, dz]^T
+    # 如果调用方传入了机身质心相对髋关节的本体系偏移 (dx, dz):
     if dx is not None and dz is not None:
-        p_com_body = p_hip + R_b @ np.array([dx, dz])
+        # p_com_body: 机身质心在世界坐标系下的绝对空间位置 (米)
+        p_com_body: np.ndarray = p_hip + R_b @ np.array([dx, dz])
         joints["com_body"] = p_com_body
 
     return joints
@@ -269,65 +258,54 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
 def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算足端爪尖的雅可比矩阵 J_tip(q) (2x6 矩阵)。
-    
-    【小白通俗微积分原理】：
-    雅可比矩阵是末端位移向量 p_tip 对 6 个广义坐标向量 q 的偏导数矩阵：
-        J_tip = [ ∂p_tip/∂q1,  ∂p_tip/∂q2,  ∂p_tip/∂q3,  ∂p_tip/∂q4,  ∂p_tip/∂q5,  ∂p_tip/∂q6 ]
-    
-    我们逐列看看为什么公式是这样写出来的（链式求导）：
-    - 第 1 列 (∂/∂q1)：
-      x_tip = q1 + ...，所以 ∂x_tip/∂q1 = 1；z_tip 里没有 q1，所以 ∂z_tip/∂q1 = 0。
-      物理含义：机器人水平整体平移 1 米，脚尖也跟着水平平移 1 米。第一列恒为 [1, 0]^T。
-    - 第 2 列 (∂/∂q2)：
-      同理，竖直方向平移对脚尖的偏导恒为 [0, 1]^T。
-    - 第 3 列 (∂/∂q3 机身俯仰角) 与 第 4 列 (∂/∂q4 髋关节角)：
-      由于 alpha1 = q3 + q4, alpha2 = q3 + q4 + q5 ...
-      对 q3 和 q4 求偏导，链式因子 ∂alpha_i / ∂q3 和 ∂alpha_i / ∂q4 全部都等于 1！
-      因为 d(cos(a))/da = -sin(a)，d(sin(a))/da = cos(a)：
-      所以偏导数为：
-        J_13 = J_14 = -(l1*sin(a1) + l2*sin(a2) + l3*sin(a3) + l4*sin(a4))
-        J_23 = J_24 =   l1*cos(a1) + l2*cos(a2) + l3*cos(a3) + l4*cos(a4)
-      物理含义：整个机身昂头 1 度，和大腿转动 1 度，对脚尖空间位移的瞬间影响是完全等价的！
-    - 第 5 列 (∂/∂q5 踝关节角)：
-      踝关节位于大腿末端，它的转动完全影响不到大腿 l1（因为 l1 在它上面），
-      所以这一列里只含有后面的 l2, l3, l4 项，没有 l1 项！
-    - 第 6 列 (∂/∂q6 趾关节角)：
-      脚趾是肢体最末节，它的偏转完全不会带动大腿和小腿，所以这一列只含有 l4 项！
-
-    【返回】：
-    np.ndarray (2, 6) 的双精度浮点数矩阵。
     """
-    l1, l2, l3, l4 = params["l1"], params["l2"], params["l3"], params["l4"]
-    theta3 = params["theta3"]
+    l1: float = params["l1"]          # 大腿长 (米)
+    l2: float = params["l2"]          # 小腿长 (米)
+    l3: float = params["l3"]          # 偏移杆长 (米)
+    l4: float = params["l4"]          # 脚趾长 (米)
+    theta3: float = params["theta3"]  # 固定角 (弧度)
 
-    # 计算各连杆绝对角
+    # 4 根连杆绝对角度
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
 
-    # 预先计算正弦与余弦值，避免重复计算提升效率
-    s1, c1 = np.sin(a1), np.cos(a1)
-    s2, c2 = np.sin(a2), np.cos(a2)
-    s3, c3 = np.sin(a3), np.cos(a3)
-    s4, c4 = np.sin(a4), np.cos(a4)
+    # s1~s4, c1~c4: 各连杆倾角的正弦值与余弦值
+    s1: float = np.sin(a1)
+    c1: float = np.cos(a1)
+    s2: float = np.sin(a2)
+    c2: float = np.cos(a2)
+    s3: float = np.sin(a3)
+    c3: float = np.cos(a3)
+    s4: float = np.sin(a4)
+    c4: float = np.cos(a4)
 
-    J = np.zeros((2, 6), dtype=np.float64)
+    # J: 初始化 2 行 6 列的全零双精度雅可比矩阵
+    # 行 0 代表末端水平位置 X_tip，行 1 代表末端垂直位置 Z_tip
+    # 列 0~5 分别对应广义坐标 q1, q2, q3, q4, q5, q6
+    J: np.ndarray = np.zeros((2, 6), dtype=np.float64)
 
-    # 第 1 列、第 2 列：浮基平动项
+    # 第 1 列、第 2 列：机身整体平动对足端的影响
+    # 机器人整体向前平移 1 米，脚尖也跟着向前平移 1 米：∂X_tip/∂q1 = 1.0, ∂Z_tip/∂q1 = 0.0
     J[0, 0] = 1.0
+    # 机器人整体向上平移 1 米，脚尖也跟着向上平移 1 米：∂X_tip/∂q2 = 0.0, ∂Z_tip/∂q2 = 1.0
     J[1, 1] = 1.0
 
-    # 第 3 列 (q3: 俯仰角) 与 第 4 列 (q4: 髋关节角)
-    J_13 = -(l1 * s1 + l2 * s2 + l3 * s3 + l4 * s4)
-    J_23 = l1 * c1 + l2 * c2 + l3 * c3 + l4 * c4
+    # J_13, J_23: 机身俯仰角 q3 与 髋关节角 q4 对足端坐标的偏导数
+    # J_13: 旋转角度变化 1 弧度引起末端 X 方向的变化率 (米/弧度)
+    J_13: float = -(l1 * s1 + l2 * s2 + l3 * s3 + l4 * s4)
+    # J_23: 旋转角度变化 1 弧度引起末端 Z 方向的变化率 (米/弧度)
+    J_23: float = l1 * c1 + l2 * c2 + l3 * c3 + l4 * c4
+
+    # 写入第 3 列 (q3 俯仰角) 与第 4 列 (q4 髋关节角)
     J[0, 2] = J_13
     J[1, 2] = J_23
     J[0, 3] = J_13
     J[1, 3] = J_23
 
-    # 第 5 列 (q5: 踝关节角，影响 l2, l3, l4)
+    # 写入第 5 列 (q5 踝关节角)：大腿 l1 位于踝关节近端上方，不受其影响，仅有小腿、偏移杆、脚趾项
     J[0, 4] = -(l2 * s2 + l3 * s3 + l4 * s4)
     J[1, 4] = l2 * c2 + l3 * c3 + l4 * c4
 
-    # 第 6 列 (q6: 趾关节角，仅影响脚趾连杆 l4)
+    # 写入第 6 列 (q6 趾关节偏转角)：仅影响肢体末梢的脚趾连杆 l4
     J[0, 5] = -l4 * s4
     J[1, 5] = l4 * c4
 
@@ -337,40 +315,41 @@ def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
 def jacobian_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算趾关节旋转中心 (p_toe) 的雅可比矩阵 J_toe(q) (2x6 矩阵)。
-    
-    【小白理解点】：
-    趾关节位于脚趾连杆 l4 的根部，因此脚趾本身的偏转角 q6 不可能影响到趾关节自己的位置！
-    所以：J_toe 的第 6 列（最后一列）必然严格全为 0.0。
-    前 5 列的计算方式与 jacobian_tip 完全一致，只是去掉了连杆 l4 的贡献。
     """
-    l1, l2, l3 = params["l1"], params["l2"], params["l3"]
-    theta3 = params["theta3"]
+    l1: float = params["l1"]          # 大腿长 (米)
+    l2: float = params["l2"]          # 小腿长 (米)
+    l3: float = params["l3"]          # 偏移杆长 (米)
+    theta3: float = params["theta3"]  # 固定角 (弧度)
 
     a1, a2, a3, _ = compute_absolute_angles(q, theta3)
 
-    s1, c1 = np.sin(a1), np.cos(a1)
-    s2, c2 = np.sin(a2), np.cos(a2)
-    s3, c3 = np.sin(a3), np.cos(a3)
+    s1: float = np.sin(a1)
+    c1: float = np.cos(a1)
+    s2: float = np.sin(a2)
+    c2: float = np.cos(a2)
+    s3: float = np.sin(a3)
+    c3: float = np.cos(a3)
 
-    J = np.zeros((2, 6), dtype=np.float64)
+    # J: 趾关节雅可比矩阵，形状 2x6
+    J: np.ndarray = np.zeros((2, 6), dtype=np.float64)
 
-    # 浮基平动列
+    # 浮基平动项
     J[0, 0] = 1.0
     J[1, 1] = 1.0
 
-    # 俯仰角与髋关节列
-    J_13 = -(l1 * s1 + l2 * s2 + l3 * s3)
-    J_23 = l1 * c1 + l2 * c2 + l3 * c3
+    # J_13, J_23: 俯仰角与髋关节角对趾关节中心位置的偏导数
+    J_13: float = -(l1 * s1 + l2 * s2 + l3 * s3)
+    J_23: float = l1 * c1 + l2 * c2 + l3 * c3
     J[0, 2] = J_13
     J[1, 2] = J_23
     J[0, 3] = J_13
     J[1, 3] = J_23
 
-    # 踝关节列
+    # 踝关节角对趾关节的偏导数 (只含 l2, l3 项)
     J[0, 4] = -(l2 * s2 + l3 * s3)
     J[1, 4] = l2 * c2 + l3 * c3
 
-    # 趾关节列（趾关节位置不受自身转角影响，导数为 0）
+    # 第 6 列：脚趾本身的弯折角 q6 绝不会改变趾关节铰链自身的位置，因此偏导严格全为 0.0
     J[0, 5] = 0.0
     J[1, 5] = 0.0
 
@@ -380,58 +359,48 @@ def jacobian_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
 def jacobian_dot_tip(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算爪尖雅可比矩阵对时间的全微分矩阵 d(J_tip)/dt (2x6 矩阵)。
-
-    【小白微积分推导过程】：
-    我们看 J 矩阵中的某一项，比如 J_16 = -l4 * sin(a4)。
-    当机器人运动时，角度 a4 随时间在变。根据微积分链式求导法则：
-        d/dt [-l4 * sin(a4)] = -l4 * cos(a4) * (d(a4)/dt) = -l4 * cos(a4) * a4_dot
-    
-    同理：
-        d/dt [l4 * cos(a4)] = -l4 * sin(a4) * a4_dot
-
-    通过把 J_tip 的每一个非零元素对时间 t 运用全微分，就能求出精确的 J_dot 矩阵！
-    注意：因为 J 的前两列是纯常数 [1, 0]^T 和 [0, 1]^T，常数对时间的导数严格为 0，
-    所以 J_dot 的前两列严格全为 0。
-
-    【输入】：
-    - q: 6 维广义坐标向量
-    - q_dot: 6 维广义角速度向量
-    - params: 几何参数字典
-
-    【输出】：
-    - np.ndarray (2, 6) 的时间导数矩阵
     """
-    l1, l2, l3, l4 = params["l1"], params["l2"], params["l3"], params["l4"]
-    theta3 = params["theta3"]
+    l1: float = params["l1"]          # 大腿长 (米)
+    l2: float = params["l2"]          # 小腿长 (米)
+    l3: float = params["l3"]          # 偏移杆长 (米)
+    l4: float = params["l4"]          # 脚趾长 (米)
+    theta3: float = params["theta3"]  # 固定角 (弧度)
 
-    # 1. 获得绝对倾角 a1~a4 以及绝对角速度 da1~da4
+    # a1~a4: 连杆绝对角度 (弧度)
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
+    # da1~da4: 连杆绝对角速度 (弧度/秒)
     da1, da2, da3, da4 = compute_absolute_angle_rates(q_dot)
 
-    s1, c1 = np.sin(a1), np.cos(a1)
-    s2, c2 = np.sin(a2), np.cos(a2)
-    s3, c3 = np.sin(a3), np.cos(a3)
-    s4, c4 = np.sin(a4), np.cos(a4)
+    s1: float = np.sin(a1)
+    c1: float = np.cos(a1)
+    s2: float = np.sin(a2)
+    c2: float = np.cos(a2)
+    s3: float = np.sin(a3)
+    c3: float = np.cos(a3)
+    s4: float = np.sin(a4)
+    c4: float = np.cos(a4)
 
-    J_dot = np.zeros((2, 6), dtype=np.float64)
+    # J_dot: 雅可比时间导数矩阵，形状 2x6，单位：米/(弧度·秒)
+    J_dot: np.ndarray = np.zeros((2, 6), dtype=np.float64)
 
-    # 前两列（常数的导数 = 0）自动为 0.0
+    # 第 1 列、第 2 列因常数导数为零，自动保留 0.0
 
-    # 第 3、4 列对时间的全导数
-    # d/dt [-(l1*s1 + l2*s2 + ...)] = -(l1*c1*da1 + l2*c2*da2 + ...)
-    # d/dt [ l1*c1 + l2*c2 + ...]  = -(l1*s1*da1 + l2*s2*da2 + ...)
-    jdot_13 = -(l1 * c1 * da1 + l2 * c2 * da2 + l3 * c3 * da3 + l4 * c4 * da4)
-    jdot_23 = -(l1 * s1 * da1 + l2 * s2 * da2 + l3 * s3 * da3 + l4 * s4 * da4)
+    # jdot_13: J_13 元素对时间的全导数 d(J_13)/dt
+    jdot_13: float = -(l1 * c1 * da1 + l2 * c2 * da2 + l3 * c3 * da3 + l4 * c4 * da4)
+    # jdot_23: J_23 元素对时间的全导数 d(J_23)/dt
+    jdot_23: float = -(l1 * s1 * da1 + l2 * s2 * da2 + l3 * s3 * da3 + l4 * s4 * da4)
+
+    # 填入第 3 列 (俯仰) 与第 4 列 (髋关节)
     J_dot[0, 2] = jdot_13
     J_dot[1, 2] = jdot_23
     J_dot[0, 3] = jdot_13
     J_dot[1, 3] = jdot_23
 
-    # 第 5 列对时间的全导数
+    # 填入第 5 列 (踝关节对时间的全导数)
     J_dot[0, 4] = -(l2 * c2 * da2 + l3 * c3 * da3 + l4 * c4 * da4)
     J_dot[1, 4] = -(l2 * s2 * da2 + l3 * s3 * da3 + l4 * s4 * da4)
 
-    # 第 6 列对时间的全导数
+    # 填入第 6 列 (趾关节对时间的全导数)
     J_dot[0, 5] = -l4 * c4 * da4
     J_dot[1, 5] = -l4 * s4 * da4
 
@@ -441,33 +410,38 @@ def jacobian_dot_tip(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float])
 def jacobian_dot_toe(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算趾关节雅可比矩阵对时间的全微分矩阵 d(J_toe)/dt (2x6 矩阵)。
-    
-    【小白理解点】：
-    与 jacobian_dot_tip 的区别同样是去掉了末端 l4 脚趾项；
-    前两列（平动）与最后一列（脚趾偏转）的导数均严格为 0。
     """
-    l1, l2, l3 = params["l1"], params["l2"], params["l3"]
-    theta3 = params["theta3"]
+    l1: float = params["l1"]          # 大腿长 (米)
+    l2: float = params["l2"]          # 小腿长 (米)
+    l3: float = params["l3"]          # 偏移杆长 (米)
+    theta3: float = params["theta3"]  # 固定角 (弧度)
 
     a1, a2, a3, _ = compute_absolute_angles(q, theta3)
     da1, da2, da3, _ = compute_absolute_angle_rates(q_dot)
 
-    s1, c1 = np.sin(a1), np.cos(a1)
-    s2, c2 = np.sin(a2), np.cos(a2)
-    s3, c3 = np.sin(a3), np.cos(a3)
+    s1: float = np.sin(a1)
+    c1: float = np.cos(a1)
+    s2: float = np.sin(a2)
+    c2: float = np.cos(a2)
+    s3: float = np.sin(a3)
+    c3: float = np.cos(a3)
 
-    J_dot = np.zeros((2, 6), dtype=np.float64)
+    # J_dot: 趾关节雅可比时间导数矩阵，形状 2x6
+    J_dot: np.ndarray = np.zeros((2, 6), dtype=np.float64)
 
-    jdot_13 = -(l1 * c1 * da1 + l2 * c2 * da2 + l3 * c3 * da3)
-    jdot_23 = -(l1 * s1 * da1 + l2 * s2 * da2 + l3 * s3 * da3)
+    # 俯仰与髋关节项
+    jdot_13: float = -(l1 * c1 * da1 + l2 * c2 * da2 + l3 * c3 * da3)
+    jdot_23: float = -(l1 * s1 * da1 + l2 * s2 * da2 + l3 * s3 * da3)
     J_dot[0, 2] = jdot_13
     J_dot[1, 2] = jdot_23
     J_dot[0, 3] = jdot_13
     J_dot[1, 3] = jdot_23
 
+    # 踝关节项
     J_dot[0, 4] = -(l2 * c2 * da2 + l3 * c3 * da3)
     J_dot[1, 4] = -(l2 * s2 * da2 + l3 * s3 * da3)
 
+    # 趾关节列严格为 0
     J_dot[0, 5] = 0.0
     J_dot[1, 5] = 0.0
 
