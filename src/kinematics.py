@@ -36,15 +36,21 @@ EPFL RAVEN 机器人矢状面 6-DOF 运动学与雅可比矩阵模块 (Step 1)
 =============================================================================
 """
 
-import os
-from typing import Dict, Any, Tuple
-import yaml
-import numpy as np
+import os  # 操作系统路径工具：用于获取当前文件位置并拼接配置文件路径
+from typing import Dict, Any, Tuple  # 类型注解：Dict 字典、Any 任意类型、Tuple 元组
+import yaml  # YAML 解析库：读取 config/robot_paras.yaml 配置文件
+import numpy as np  # 数值计算库：向量、矩阵运算与三角函数
 
 
 def load_kinematics_params(config_path: str = None) -> Dict[str, float]:
     """
     【功能】：从 YAML 配置文件中加载机器人机构的几何尺寸参数。
+
+    【输入】：
+    - config_path: YAML 配置文件路径；为 None 时自动使用项目内 config/robot_paras.yaml
+
+    【输出】：
+    - params: 包含各杆长（l1~l4，米）、theta3（弧度）和 body_length（米）的字典
     """
     if config_path is None:
         # curr_dir: 当前代码文件 (kinematics.py) 所在的本地绝对目录 (字符串)
@@ -111,6 +117,9 @@ def compute_absolute_angle_rates(q_dot: np.ndarray) -> Tuple[float, float, float
 
     【输入变量说明】：
     - q_dot: 6 维广义速度向量 [q1_dot, q2_dot, q3_dot, q4_dot, q5_dot, q6_dot]
+
+    【输出】：
+    - (alpha1_dot, alpha2_dot, alpha3_dot, alpha4_dot): 4 个绝对角速度 (rad/s)
     """
     # 从广义速度数组 q_dot 中提取出各转动自由度的一阶时间导数（角速度）：
     q3_dot: float = q_dot[2]  # q3_dot: 机身俯仰角速度 (rad/s)
@@ -137,6 +146,13 @@ def compute_absolute_angle_rates(q_dot: np.ndarray) -> Tuple[float, float, float
 def forward_kinematics_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：正向运动学函数 —— 计算足端爪尖 (p_claw / p_tip) 在世界坐标系下的绝对坐标。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - params: 包含 l1~l4 与 theta3 的参数字典
+
+    【输出】：
+    - 长度为 2 的数组 [X_tip, Z_tip]，单位：米
     """
     # q1, q2: 左右两髋关节连线中点在世界惯性系下的绝对坐标 (X_hip, Z_hip)，单位：米
     q1: float = q[0]
@@ -167,6 +183,13 @@ def forward_kinematics_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarra
 def forward_kinematics_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：正向运动学函数 —— 计算趾关节旋转中心 (p_toe / J4) 在世界坐标系下的绝对坐标。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - params: 包含 l1~l3 与 theta3 的参数字典（趾关节不依赖脚趾长 l4）
+
+    【输出】：
+    - 长度为 2 的数组 [X_toe, Z_toe]，单位：米
     """
     q1: float = q[0]  # 髋关节连线中点水平坐标 X (米)
     q2: float = q[1]  # 髋关节连线中点垂直坐标 Z (米)
@@ -192,6 +215,14 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
                                   dx: float = None, dz: float = None) -> Dict[str, np.ndarray]:
     """
     【功能】：正向运动学调试与绘图利器 —— 计算机器人身体所有关键骨架点的坐标。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - params: 包含 l1~l4、theta3 与可选 body_length 的参数字典
+    - dx, dz: 可选，机身质心相对髋关节在机身本体系下的偏移（米）；提供时才计算 com_body
+
+    【输出】：
+    - 字典，键为关节名（hip、ankle、base、toe、tip、nose、tail，可选 com_body），值为世界坐标 [X, Z]（米）
     """
     q1: float = q[0]  # 髋关节中点 X 位置 (米)
     q2: float = q[1]  # 髋关节中点 Z 位置 (米)
@@ -258,6 +289,13 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
 def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算足端爪尖的雅可比矩阵 J_tip(q) (2x6 矩阵)。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - params: 包含 l1~l4 与 theta3 的参数字典
+
+    【输出】：
+    - J: 形状 (2, 6) 的雅可比矩阵，满足 V_tip = J @ q_dot
     """
     l1: float = params["l1"]          # 大腿长 (米)
     l2: float = params["l2"]          # 小腿长 (米)
@@ -269,14 +307,14 @@ def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
 
     # s1~s4, c1~c4: 各连杆倾角的正弦值与余弦值
-    s1: float = np.sin(a1)
-    c1: float = np.cos(a1)
-    s2: float = np.sin(a2)
-    c2: float = np.cos(a2)
-    s3: float = np.sin(a3)
-    c3: float = np.cos(a3)
-    s4: float = np.sin(a4)
-    c4: float = np.cos(a4)
+    s1: float = np.sin(a1)  # 大腿倾角 a1 的正弦
+    c1: float = np.cos(a1)  # 大腿倾角 a1 的余弦
+    s2: float = np.sin(a2)  # 小腿倾角 a2 的正弦
+    c2: float = np.cos(a2)  # 小腿倾角 a2 的余弦
+    s3: float = np.sin(a3)  # 偏移杆倾角 a3 的正弦
+    c3: float = np.cos(a3)  # 偏移杆倾角 a3 的余弦
+    s4: float = np.sin(a4)  # 脚趾连杆倾角 a4 的正弦
+    c4: float = np.cos(a4)  # 脚趾连杆倾角 a4 的余弦
 
     # J: 初始化 2 行 6 列的全零双精度雅可比矩阵
     # 行 0 代表末端水平位置 X_tip，行 1 代表末端垂直位置 Z_tip
@@ -315,20 +353,28 @@ def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
 def jacobian_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算趾关节旋转中心 (p_toe) 的雅可比矩阵 J_toe(q) (2x6 矩阵)。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - params: 包含 l1~l3 与 theta3 的参数字典
+
+    【输出】：
+    - J: 形状 (2, 6) 的雅可比矩阵，满足 V_toe = J @ q_dot
     """
     l1: float = params["l1"]          # 大腿长 (米)
     l2: float = params["l2"]          # 小腿长 (米)
     l3: float = params["l3"]          # 偏移杆长 (米)
     theta3: float = params["theta3"]  # 固定角 (弧度)
 
-    a1, a2, a3, _ = compute_absolute_angles(q, theta3)
+    a1, a2, a3, _ = compute_absolute_angles(q, theta3)  # 趾关节不经过 l4，故忽略 a4
 
-    s1: float = np.sin(a1)
-    c1: float = np.cos(a1)
-    s2: float = np.sin(a2)
-    c2: float = np.cos(a2)
-    s3: float = np.sin(a3)
-    c3: float = np.cos(a3)
+    # s1~s3, c1~c3: 大腿、小腿、偏移杆绝对倾角的正弦与余弦值
+    s1: float = np.sin(a1)  # 大腿倾角 a1 的正弦
+    c1: float = np.cos(a1)  # 大腿倾角 a1 的余弦
+    s2: float = np.sin(a2)  # 小腿倾角 a2 的正弦
+    c2: float = np.cos(a2)  # 小腿倾角 a2 的余弦
+    s3: float = np.sin(a3)  # 偏移杆倾角 a3 的正弦
+    c3: float = np.cos(a3)  # 偏移杆倾角 a3 的余弦
 
     # J: 趾关节雅可比矩阵，形状 2x6
     J: np.ndarray = np.zeros((2, 6), dtype=np.float64)
@@ -359,6 +405,14 @@ def jacobian_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
 def jacobian_dot_tip(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算爪尖雅可比矩阵对时间的全微分矩阵 d(J_tip)/dt (2x6 矩阵)。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - q_dot: 6 维广义速度 [q1_dot, ..., q6_dot]
+    - params: 包含 l1~l4 与 theta3 的参数字典
+
+    【输出】：
+    - J_dot: 形状 (2, 6) 的矩阵，用于加速度计算 a_tip = J @ q_ddot + J_dot @ q_dot
     """
     l1: float = params["l1"]          # 大腿长 (米)
     l2: float = params["l2"]          # 小腿长 (米)
@@ -371,14 +425,15 @@ def jacobian_dot_tip(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float])
     # da1~da4: 连杆绝对角速度 (弧度/秒)
     da1, da2, da3, da4 = compute_absolute_angle_rates(q_dot)
 
-    s1: float = np.sin(a1)
-    c1: float = np.cos(a1)
-    s2: float = np.sin(a2)
-    c2: float = np.cos(a2)
-    s3: float = np.sin(a3)
-    c3: float = np.cos(a3)
-    s4: float = np.sin(a4)
-    c4: float = np.cos(a4)
+    # s1~s4, c1~c4: 各连杆绝对倾角的正弦值与余弦值（用于后续导数公式）
+    s1: float = np.sin(a1)  # 大腿连杆倾角 a1 的正弦
+    c1: float = np.cos(a1)  # 大腿连杆倾角 a1 的余弦
+    s2: float = np.sin(a2)  # 小腿连杆倾角 a2 的正弦
+    c2: float = np.cos(a2)  # 小腿连杆倾角 a2 的余弦
+    s3: float = np.sin(a3)  # 偏移杆倾角 a3 的正弦
+    c3: float = np.cos(a3)  # 偏移杆倾角 a3 的余弦
+    s4: float = np.sin(a4)  # 脚趾连杆倾角 a4 的正弦
+    c4: float = np.cos(a4)  # 脚趾连杆倾角 a4 的余弦
 
     # J_dot: 雅可比时间导数矩阵，形状 2x6，单位：米/(弧度·秒)
     J_dot: np.ndarray = np.zeros((2, 6), dtype=np.float64)
@@ -410,6 +465,14 @@ def jacobian_dot_tip(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float])
 def jacobian_dot_toe(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     """
     【功能】：解析计算趾关节雅可比矩阵对时间的全微分矩阵 d(J_toe)/dt (2x6 矩阵)。
+
+    【输入】：
+    - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
+    - q_dot: 6 维广义速度 [q1_dot, ..., q6_dot]
+    - params: 包含 l1~l3 与 theta3 的参数字典
+
+    【输出】：
+    - J_dot: 形状 (2, 6) 的矩阵，用于趾关节加速度计算
     """
     l1: float = params["l1"]          # 大腿长 (米)
     l2: float = params["l2"]          # 小腿长 (米)
@@ -417,14 +480,15 @@ def jacobian_dot_toe(q: np.ndarray, q_dot: np.ndarray, params: Dict[str, float])
     theta3: float = params["theta3"]  # 固定角 (弧度)
 
     a1, a2, a3, _ = compute_absolute_angles(q, theta3)
-    da1, da2, da3, _ = compute_absolute_angle_rates(q_dot)
+    da1, da2, da3, _ = compute_absolute_angle_rates(q_dot)  # 前三段连杆的绝对角速度
 
-    s1: float = np.sin(a1)
-    c1: float = np.cos(a1)
-    s2: float = np.sin(a2)
-    c2: float = np.cos(a2)
-    s3: float = np.sin(a3)
-    c3: float = np.cos(a3)
+    # s1~s3, c1~c3: 大腿、小腿、偏移杆绝对倾角的正弦与余弦值
+    s1: float = np.sin(a1)  # 大腿倾角 a1 的正弦
+    c1: float = np.cos(a1)  # 大腿倾角 a1 的余弦
+    s2: float = np.sin(a2)  # 小腿倾角 a2 的正弦
+    c2: float = np.cos(a2)  # 小腿倾角 a2 的余弦
+    s3: float = np.sin(a3)  # 偏移杆倾角 a3 的正弦
+    c3: float = np.cos(a3)  # 偏移杆倾角 a3 的余弦
 
     # J_dot: 趾关节雅可比时间导数矩阵，形状 2x6
     J_dot: np.ndarray = np.zeros((2, 6), dtype=np.float64)
