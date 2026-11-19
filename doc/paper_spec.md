@@ -4,7 +4,7 @@
 
 ## 1. 广义坐标与坐标系定义 (System Coordinates)
 
-### 1.1 坐标系建立_step1
+### 1.1 坐标系建立
 
 1. **世界惯性坐标系** \(O\text{-}XZ\) **(World Frame)**：
    * **原点** \(O\)：固定于水平地面，取初始构型下尾巴末端在地面上的投影点（依据论文 Extended Data Fig. 5a Base Frame）。
@@ -57,8 +57,8 @@ $$
   2. **垂直区间** \(d_z \in (0, 0.052)\ \text{m}\) **（髋上 0 至 5.2 cm 之间）**：
      * **下界** \(d_z > 0\)：论文 p4 指明髋关节安装于机翼前缘下方及附近（*"placed the hips below and near the wing leading edge"*），机身大部分刚体质量（机身、电子设备、机翼等）均位于髋部上方，故质心在髋关节上方；
      * **上界** \(d_z < 0.052\ \text{m}\)：论文 p4 指明质心必须位于气动合力中心下方（*"below the center of aerodynamic forces"*）；结合 Extended Data Table 2 中机翼（面积 \(0.18\ \text{m}^2\)，高度 \(P_{w,z} = 0.042\ \text{m}\)）与尾翼（面积 \(0.0864\ \text{m}^2\)，高度 \(P_{t,z} = 0.074\ \text{m}\)）按面积加权估算全机气动中立点高度：
-     \(z_{\text{NP}} \approx \frac{0.18 \times 0.042 + 0.0864 \times 0.074}{0.18 + 0.0864} \approx 0.0524\ \text{m}\)
-     因此垂直位置必须满足 \(d_z < 0.052\ \text{m}\)。
+       \(z_{\text{NP}} \approx \frac{0.18 \times 0.042 + 0.0864 \times 0.074}{0.18 + 0.0864} \approx 0.0524\ \text{m}\)
+       因此垂直位置必须满足 \(d_z < 0.052\ \text{m}\)。
   3. **地面静态与起步支撑多边形约束**：论文 p4、p13 及 Extended Data Fig. 3d 指出，静态站立时质心地面投影落在趾关节与后爪（hallux）构成的足底支撑区间内，以实现被动平衡；起跳构型下质心微偏趾关节前侧（支持向前蹬伸）。
   4. **工程落地原则**：根据项目规范，此区间仅作为 Step 3 动力学方程参数的可行域约束，当前阶段**暂不填入未经验证的经验常数**（详见 `doc/missing_params_log.md`）。
 
@@ -128,7 +128,7 @@ $$
 \mathbf{p}_2 = \mathbf{p}_1 + R(\alpha_1)\begin{bmatrix} l_1 \\ 0 \end{bmatrix} = \begin{bmatrix} q_1 + l_1 \cos\alpha_1 \\ q_2 + l_1 \sin\alpha_1 \end{bmatrix}
 $$
 
-3. **下肢末端基点位置** \(\mathbf{p}_{\text{base}}\) (\(J_3\))：
+3. **偏移杆基点位置** \(\mathbf{p}_{\text{base}}\) (\(J_3\))：
 
 $$
 \mathbf{p}_3 = \mathbf{p}_2 + R(\alpha_2)\begin{bmatrix} l_2 \\ 0 \end{bmatrix} = \begin{bmatrix} x_{\text{ankle}} + l_2 \cos\alpha_2 \\ z_{\text{ankle}} + l_2 \sin\alpha_2 \end{bmatrix}
