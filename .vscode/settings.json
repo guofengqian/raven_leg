@@ -1,7 +1,11 @@
 {
+  "markdown-preview-enhanced.mathRenderingOption": "KaTeX",
+  "markdown-preview-enhanced.mathInlineDelimiters": [["$", "$"], ["\\(", "\\)"]],
+  "markdown-preview-enhanced.mathBlockDelimiters": [["$$", "$$"], ["\\[", "\\]"]],
   "mujoco-viewer.editor.defaultViewer": "viewer",
   "mujoco-viewer.editor.openBehavior": "beside",
   "workbench.editorAssociations": {
-    "*.xml": "mujoco-viewer.editor"
+    "*.xml": "mujoco-viewer.editor",
+    "*.md": "default"
   }
 }

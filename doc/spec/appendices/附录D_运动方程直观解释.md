@@ -77,7 +77,7 @@
 | \(\boldsymbol{\tau}\) | \(\mathbb{R}^2\) | N·m，N·m | 髋、踝两路电机关节侧力矩 |
 | \(\mathbf{S}^T\) | \(6\times 2\) | 无量纲（0/1 选择） | 只把 \(\boldsymbol{\tau}\) 写进 \(q_4,q_5\) 两个槽 |
 | \(\mathbf{S}^T\boldsymbol{\tau}\) | \(\mathbb{R}^6\) | 仅第 4、5 分量为 N·m，其余为 0 | 驱动广义力 |
-| \(\mathbf{f}_{\text{ext}}\) | \(\mathbb{R}^6\) | 广义力：N 或 N·m（按行） | \(\boldsymbol{\tau}_{\text{spring}}+\mathbf{f}_w+\mathbf{f}_t\)（可含 \(\mathbf{f}_p\)；见第 2 章）；**不含** \(\mathbf{S}^T\boldsymbol{\tau}\) |
+| \(\mathbf{f}_{\text{ext}}\) | \(\mathbb{R}^6\) | 广义力：N 或 N·m（按行） | \(\boldsymbol{\tau}_{\text{spring}}+\mathbf{f}_w+\mathbf{f}_t+\mathbf{f}_p\)（见第 2 章）；**不含** \(\mathbf{S}^T\boldsymbol{\tau}\) |
 | \(\mathbf{F}_{w/t}\) | \(\mathbb{R}^2\) | N，N | 压心处气动力（世界系 \(x,y\)） |
 | \(\mathbf{J}_{w/t}\) | \(2\times 6\) | 同点雅可比：映到 m/s | \(\mathbf{f}_{w/t}=\mathbf{J}_{w/t}^T\mathbf{F}_{w/t}\) |
 | \(\boldsymbol{\tau}_a,\boldsymbol{\tau}_t\) | 嵌入 \(\mathbb{R}^6\) | 分别只在 \(q_5\)、\(q_6\) 槽为 N·m | 扭簧广义力矩 |
