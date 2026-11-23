@@ -7,25 +7,26 @@ EPFL RAVEN 机器人矢状面 6-DOF 运动学与雅可比矩阵模块 (Step 1)
 很多初学者看到“正运动学”、“雅可比矩阵”会觉得高深，其实物理本质非常直观：
 
 1. 什么是正运动学 (Forward Kinematics, FK)？
-   - 通俗说就是：“知道了各个关节转了多少度，算出脚尖在世界上的具体坐标 (X, Z)”。
+   - 通俗说就是：“知道了各个广义坐标，算出爪尖 / 趾关节在世界上的具体坐标 (X, Y)”。
    - 就像折线画火柴人：从髋关节出发，知道每根骨头的长度和朝向角度，一截一截把向量
-     加起来，最终就能精确算出脚尖、脚趾在哪里。
+     加起来，最终就能精确算出趾关节铰点、爪尖在哪里。
 
 2. 什么是雅可比矩阵 (Jacobian Matrix, J)？
-   - 通俗说就是：“关节转动的速度，怎样放大或缩小成脚尖移动的线速度”。
-   - 它是末端位置对关节角度的偏导数矩阵（即多维的传动比）：
-       脚尖速度 V_tip = J * 关节角速度 q_dot
-   - 雅可比的每一列代表：如果对应的那个关节以 1 rad/s 转动，脚尖会在 X 和 Z 方向以多大速度移动。
+   - 主语是爪尖与趾关节（不是整机、也不是某个电机本身）：
+       爪尖速度   V_tip = J_tip * q_dot
+       趾关节速度 V_toe = J_toe * q_dot
+   - 通俗说就是：“广义速度怎样线性组合成爪尖（或趾关节）的线速度”。
+   - 每一列代表：只动第 j 个广义坐标、速率为 1 时，该点在 X、Y 方向得到多大速度。
 
 3. 什么是雅可比时间导数 (Jacobian Time Derivative, J_dot)？
-   - 机械臂在旋转时，不仅姿态在变，各关节到末端的“杠杆臂长度”也在动态变化。
-   - 对速度公式再次求导：
-       脚尖加速度 a_tip = J * 关节角加速度 q_ddot + J_dot * 关节角速度 q_dot
+   - 构型在变时，爪尖 / 趾关节相对各转动中心的“杠杆臂”也在变。
+   - 对速度公式再次求导（爪尖为例；趾关节同理）：
+       a_tip = J_tip * q_ddot + J_dot_tip * q_dot
    - 这里的 J_dot * q_dot 项，正好对应物理学中旋转产生的【向心加速度】和【科氏加速度】！
 
 4. 系统的 6 个广义坐标 q = [q1, q2, q3, q4, q5, q6]^T 分别是什么？
    - q1: 髋关节连线中点的水平位置 X (米，向前为正) [浮基平动，未驱动]
-   - q2: 髋关节连线中点的垂直位置 Z (米，向上为正) [浮基平动，未驱动]
+   - q2: 髋关节连线中点的垂直位置 Y (米，向上为正) [浮基平动，未驱动]
    - q3: 整个机身的俯仰角 theta_b (弧度，抬头为正) [浮基转动，未驱动]
    - q4: 髋关节转角 (弧度，大腿相对机身纵轴的相对夹角) [电机驱动]
    - q5: 踝关节转角 (弧度，下肢相对大腿的相对夹角) [电机驱动 + 并行储能弹簧]
@@ -152,9 +153,9 @@ def forward_kinematics_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarra
     - params: 包含 l1~l4 与 theta3 的参数字典
 
     【输出】：
-    - 长度为 2 的数组 [X_tip, Z_tip]，单位：米
+    - 长度为 2 的数组 [X_tip, Y_tip]，单位：米
     """
-    # q1, q2: 左右两髋关节连线中点在世界惯性系下的绝对坐标 (X_hip, Z_hip)，单位：米
+    # q1, q2: 左右两髋关节连线中点在世界惯性系下的绝对坐标 (X_hip, Y_hip)，单位：米
     q1: float = q[0]
     q2: float = q[1]
 
@@ -172,12 +173,12 @@ def forward_kinematics_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarra
     # 物理意义：基点水平位置 q1 + 各连杆水平投影 (l * cos(angle)) 依次累加
     x_tip: float = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3) + l4 * np.cos(a4)
 
-    # z_tip: 足端爪尖在世界坐标系下的垂直高度 Z (米)
+    # y_tip: 足端爪尖在世界坐标系下的垂直高度 Y (米)
     # 物理意义：基点垂直高度 q2 + 各连杆垂直投影 (l * sin(angle)) 依次累加
-    z_tip: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3) + l4 * np.sin(a4)
+    y_tip: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3) + l4 * np.sin(a4)
 
-    # 返回足端二维空间位置向量 [X_tip, Z_tip]^T
-    return np.array([x_tip, z_tip], dtype=np.float64)
+    # 返回足端二维空间位置向量 [X_tip, Y_tip]^T
+    return np.array([x_tip, y_tip], dtype=np.float64)
 
 
 def forward_kinematics_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
@@ -189,10 +190,10 @@ def forward_kinematics_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarra
     - params: 包含 l1~l3 与 theta3 的参数字典（趾关节不依赖脚趾长 l4）
 
     【输出】：
-    - 长度为 2 的数组 [X_toe, Z_toe]，单位：米
+    - 长度为 2 的数组 [X_toe, Y_toe]，单位：米
     """
     q1: float = q[0]  # 髋关节连线中点水平坐标 X (米)
-    q2: float = q[1]  # 髋关节连线中点垂直坐标 Z (米)
+    q2: float = q[1]  # 髋关节连线中点垂直坐标 Y (米)
 
     l1: float = params["l1"]          # 大腿长 (米)
     l2: float = params["l2"]          # 小腿长 (米)
@@ -205,27 +206,27 @@ def forward_kinematics_toe(q: np.ndarray, params: Dict[str, float]) -> np.ndarra
     # x_toe: 趾关节在世界坐标系下的水平坐标 X (米)
     x_toe: float = q1 + l1 * np.cos(a1) + l2 * np.cos(a2) + l3 * np.cos(a3)
 
-    # z_toe: 趾关节在世界坐标系下的垂直坐标 Z (米)
-    z_toe: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3)
+    # y_toe: 趾关节在世界坐标系下的垂直坐标 Y (米)
+    y_toe: float = q2 + l1 * np.sin(a1) + l2 * np.sin(a2) + l3 * np.sin(a3)
 
-    return np.array([x_toe, z_toe], dtype=np.float64)
+    return np.array([x_toe, y_toe], dtype=np.float64)
 
 
 def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
-                                  dx: float = None, dz: float = None) -> Dict[str, np.ndarray]:
+                                  dx: float = None, dy: float = None) -> Dict[str, np.ndarray]:
     """
     【功能】：正向运动学调试与绘图利器 —— 计算机器人身体所有关键骨架点的坐标。
 
     【输入】：
     - q: 6 维广义坐标 [q1, q2, q3, q4, q5, q6]
     - params: 包含 l1~l4、theta3 与可选 body_length 的参数字典
-    - dx, dz: 可选，机身质心相对髋关节在机身本体系下的偏移（米）；提供时才计算 com_body
+    - dx, dy: 可选，机身质心相对髋关节在机身本体系下的偏移（米）；提供时才计算 com_body
 
     【输出】：
-    - 字典，键为关节名（hip、ankle、base、toe、tip、nose、tail，可选 com_body），值为世界坐标 [X, Z]（米）
+    - 字典，键为关节名（hip、ankle、base、toe、tip、nose、tail，可选 com_body），值为世界坐标 [X, Y]（米）
     """
     q1: float = q[0]  # 髋关节中点 X 位置 (米)
-    q2: float = q[1]  # 髋关节中点 Z 位置 (米)
+    q2: float = q[1]  # 髋关节中点 Y 位置 (米)
     q3: float = q[2]  # 机身俯仰角 (弧度)
 
     l1: float = params["l1"]                     # 大腿长 (米)
@@ -238,7 +239,7 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
     # a1~a4: 腿部 4 根连杆的绝对倾角 (弧度)
     a1, a2, a3, a4 = compute_absolute_angles(q, theta3)
 
-    # p_hip: J1 髋关节世界坐标 [X, Z]，是腿部连杆链条的根原点
+    # p_hip: J1 髋关节世界坐标 [X, Y]，是腿部连杆链条的根原点
     p_hip: np.ndarray = np.array([q1, q2], dtype=np.float64)
 
     # p_ankle: J2 踝关节世界坐标，位于大腿 l1 远端
@@ -277,10 +278,10 @@ def forward_kinematics_all_joints(q: np.ndarray, params: Dict[str, float],
         "tail": p_tail,
     }
 
-    # 如果调用方传入了机身质心相对髋关节的本体系偏移 (dx, dz):
-    if dx is not None and dz is not None:
+    # 如果调用方传入了机身质心相对髋关节的本体系偏移 (dx, dy):
+    if dx is not None and dy is not None:
         # p_com_body: 机身质心在世界坐标系下的绝对空间位置 (米)
-        p_com_body: np.ndarray = p_hip + R_b @ np.array([dx, dz])
+        p_com_body: np.ndarray = p_hip + R_b @ np.array([dx, dy])
         joints["com_body"] = p_com_body
 
     return joints
@@ -317,20 +318,20 @@ def jacobian_tip(q: np.ndarray, params: Dict[str, float]) -> np.ndarray:
     c4: float = np.cos(a4)  # 脚趾连杆倾角 a4 的余弦
 
     # J: 初始化 2 行 6 列的全零双精度雅可比矩阵
-    # 行 0 代表末端水平位置 X_tip，行 1 代表末端垂直位置 Z_tip
+    # 行 0 代表末端水平位置 X_tip，行 1 代表末端垂直位置 Y_tip
     # 列 0~5 分别对应广义坐标 q1, q2, q3, q4, q5, q6
     J: np.ndarray = np.zeros((2, 6), dtype=np.float64)
 
     # 第 1 列、第 2 列：机身整体平动对足端的影响
-    # 机器人整体向前平移 1 米，脚尖也跟着向前平移 1 米：∂X_tip/∂q1 = 1.0, ∂Z_tip/∂q1 = 0.0
+    # 机器人整体向前平移 1 米，脚尖也跟着向前平移 1 米：∂X_tip/∂q1 = 1.0, ∂Y_tip/∂q1 = 0.0
     J[0, 0] = 1.0
-    # 机器人整体向上平移 1 米，脚尖也跟着向上平移 1 米：∂X_tip/∂q2 = 0.0, ∂Z_tip/∂q2 = 1.0
+    # 机器人整体向上平移 1 米，脚尖也跟着向上平移 1 米：∂X_tip/∂q2 = 0.0, ∂Y_tip/∂q2 = 1.0
     J[1, 1] = 1.0
 
     # J_13, J_23: 机身俯仰角 q3 与 髋关节角 q4 对足端坐标的偏导数
     # J_13: 旋转角度变化 1 弧度引起末端 X 方向的变化率 (米/弧度)
     J_13: float = -(l1 * s1 + l2 * s2 + l3 * s3 + l4 * s4)
-    # J_23: 旋转角度变化 1 弧度引起末端 Z 方向的变化率 (米/弧度)
+    # J_23: 旋转角度变化 1 弧度引起末端 Y 方向的变化率 (米/弧度)
     J_23: float = l1 * c1 + l2 * c2 + l3 * c3 + l4 * c4
 
     # 写入第 3 列 (q3 俯仰角) 与第 4 列 (q4 髋关节角)

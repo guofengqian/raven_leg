@@ -51,8 +51,8 @@ def test_static_geometry_analytical(params):
     q_zero = np.zeros(6, dtype=np.float64)
     p_tip_zero = forward_kinematics_tip(q_zero, params_straight)
     expected_x = l1 + l2 + l3 + l4
-    expected_z = 0.0
-    err_zero = np.linalg.norm(p_tip_zero - np.array([expected_x, expected_z]))
+    expected_y = 0.0
+    err_zero = np.linalg.norm(p_tip_zero - np.array([expected_x, expected_y]))
     assert err_zero < 1e-12, f"特例平展构型误差超标: {err_zero:.2e} m"
 
     # 构型 B: 真实 theta3 参数下，各关节纯直角弯折测试
@@ -65,15 +65,15 @@ def test_static_geometry_analytical(params):
     p_tip_ortho = forward_kinematics_tip(q_ortho, params)
 
     expected_ortho_x = 1.0 + l1 * np.cos(np.pi / 2) + l2 * np.cos(0.0) + (l3 + l4) * np.cos(theta3)
-    expected_ortho_z = 2.0 + l1 * np.sin(np.pi / 2) + l2 * np.sin(0.0) + (l3 + l4) * np.sin(theta3)
-    err_ortho = np.linalg.norm(p_tip_ortho - np.array([expected_ortho_x, expected_ortho_z]))
+    expected_ortho_y = 2.0 + l1 * np.sin(np.pi / 2) + l2 * np.sin(0.0) + (l3 + l4) * np.sin(theta3)
+    err_ortho = np.linalg.norm(p_tip_ortho - np.array([expected_ortho_x, expected_ortho_y]))
     assert err_ortho < 1e-12, f"直角折叠解析校验误差超标: {err_ortho:.2e} m"
 
     # 构型 C: 趾关节单独校验
     p_toe_ortho = forward_kinematics_toe(q_ortho, params)
     expected_toe_x = 1.0 + l1 * np.cos(np.pi / 2) + l2 * np.cos(0.0) + l3 * np.cos(theta3)
-    expected_toe_z = 2.0 + l1 * np.sin(np.pi / 2) + l2 * np.sin(0.0) + l3 * np.sin(theta3)
-    err_toe = np.linalg.norm(p_toe_ortho - np.array([expected_toe_x, expected_toe_z]))
+    expected_toe_y = 2.0 + l1 * np.sin(np.pi / 2) + l2 * np.sin(0.0) + l3 * np.sin(theta3)
+    err_toe = np.linalg.norm(p_toe_ortho - np.array([expected_toe_x, expected_toe_y]))
     assert err_toe < 1e-12, f"趾关节解析校验误差超标: {err_toe:.2e} m"
 
 
@@ -204,16 +204,16 @@ def test_visual_geometry_plot(params):
         np.deg2rad(25.0),
     ], dtype=np.float64)
 
-    # 质心偏移可行域中位候选值 dx=-0.01m, dz=0.02m (标注为候选示意)
+    # 质心偏移可行域中位候选值 dx=-0.01m, dy=0.02m (标注为候选示意)
     dx_est = -0.01
-    dz_est = 0.02
+    dy_est = 0.02
 
-    joints = forward_kinematics_all_joints(q_init, params, dx=dx_est, dz=dz_est)
+    joints = forward_kinematics_all_joints(q_init, params, dx=dx_est, dy=dy_est)
 
     fig, ax = plt.subplots(figsize=(9, 7), dpi=150)
 
     # 绘制地面
-    ax.axhline(0, color="gray", linestyle="--", linewidth=1.2, label="Ground (Z=0)")
+    ax.axhline(0, color="gray", linestyle="--", linewidth=1.2, label="Ground (Y=0)")
 
     # 绘制机身基准线 (尾巴到机头)
     nose = joints["nose"]
@@ -222,8 +222,8 @@ def test_visual_geometry_plot(params):
 
     # 绘制腿部串联连杆链: Hip -> Ankle -> Base -> Toe -> Tip
     leg_x = [joints["hip"][0], joints["ankle"][0], joints["base"][0], joints["toe"][0], joints["tip"][0]]
-    leg_z = [joints["hip"][1], joints["ankle"][1], joints["base"][1], joints["toe"][1], joints["tip"][1]]
-    ax.plot(leg_x, leg_z, color="#e65100", linewidth=3.0, marker="o", markersize=6, label="Leg Kinematic Chain")
+    leg_y = [joints["hip"][1], joints["ankle"][1], joints["base"][1], joints["toe"][1], joints["tip"][1]]
+    ax.plot(leg_x, leg_y, color="#e65100", linewidth=3.0, marker="o", markersize=6, label="Leg Kinematic Chain")
 
     # 关键点标注与标记
     ax.plot(joints["hip"][0], joints["hip"][1], "ro", markersize=9, label="J1: Hip (q1, q2)")
@@ -235,7 +235,7 @@ def test_visual_geometry_plot(params):
     # 质心标注
     if "com_body" in joints:
         com = joints["com_body"]
-        ax.plot(com[0], com[1], "y*", markersize=12, label=f"CoM (dx={dx_est}m, dz={dz_est}m)")
+        ax.plot(com[0], com[1], "y*", markersize=12, label=f"CoM (dx={dx_est}m, dy={dy_est}m)")
 
     # 文字标注
     ax.text(joints["hip"][0] + 0.01, joints["hip"][1] + 0.015, "Hip (q1,q2)", fontsize=10, fontweight="bold")
@@ -245,7 +245,7 @@ def test_visual_geometry_plot(params):
 
     ax.set_title("EPFL RAVEN - Step 1 Kinematics & Linkage Check\n(Initial Takeoff Configuration)", fontsize=13, fontweight="bold")
     ax.set_xlabel("X [m] (Forward)", fontsize=11)
-    ax.set_ylabel("Z [m] (Vertical)", fontsize=11)
+    ax.set_ylabel("Y [m] (Vertical)", fontsize=11)
     ax.grid(True, linestyle=":", alpha=0.6)
     ax.legend(loc="upper left", framealpha=0.9, fontsize=9)
     ax.set_aspect("equal", "datalim")
