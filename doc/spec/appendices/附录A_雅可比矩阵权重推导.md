@@ -1,4 +1,4 @@
-> 返回总目录：[paper_spec.md](../../paper_spec.md) | 正文对应：[第 1 章 §1.1.6](../01_脚爪的运动学方程与接触约束.md)
+> 返回总目录：[paper_spec.md](../../paper_spec.md) | 正文对应：[第 1 章 §1.1.4](../01_浮基构型与足地接触运动学.md)
 
 # 附录 A. 爪尖与趾关节的雅可比矩阵（由线速度中广义坐标的权重定义）
 
@@ -18,7 +18,7 @@ $$
 \dot{\mathbf{p}}_{\text{toe}} = J_{\text{toe}}(\mathbf{q})\,\dot{\mathbf{q}}
 $$
 
-下文以爪尖为主线写列权重；趾关节同一套规则，末端改为 \(\mathbf{p}_{\text{toe}}\)（在 \(J_4\) 截断）。实现仍以 §1.1.6 成品为准。前置：§1.1.4 的 \(\alpha_i,\dot{\alpha}_i\)，§1.1.5 的 \(\mathbf{p}_{\text{tip}},\mathbf{p}_{\text{toe}},\mathbf{p}_i\)。支撑 `tests/test_step1.py`。
+下文以爪尖为主线写列权重；趾关节同一套规则，末端改为 \(\mathbf{p}_{\text{toe}}\)（在 \(J_4\) 截断）。实现仍以 §1.1.4 成品为准。前置：§1.1.2 的 \(\alpha_i,\dot{\alpha}_i\)，§1.1.3 的 \(\mathbf{p}_{\text{tip}},\mathbf{p}_{\text{toe}},\mathbf{p}_i\)。支撑 `tests/test_step1.py`。
 
 ## A.1 定义：线速度 = 权重矩阵 \(\times\) 广义速度
 
@@ -49,9 +49,9 @@ $$
 
 **推导.**
 
-1. 正运动学已给出 \(\mathbf{p}_{\text{tip}}=\mathbf{p}_{\text{tip}}(\mathbf{q})\)（§1.1.5.2）。速度是位置对时间的导数，链式法则自动变成「对各 \(q_j\) 的偏导 × \(\dot{q}_j\)」再求和。
+1. 正运动学已给出 \(\mathbf{p}_{\text{tip}}=\mathbf{p}_{\text{tip}}(\mathbf{q})\)（§1.1.3）。速度是位置对时间的导数，链式法则自动变成「对各 \(q_j\) 的偏导 × \(\dot{q}_j\)」再求和。
 2. 把六个偏导并成一行块矩阵，左乘 \(\dot{\mathbf{q}}\)，即 \(\dot{\mathbf{p}}_{\text{tip}}=J\dot{\mathbf{q}}\)。因此 **J 不是另起炉灶的对象**，而是线速度表达式里 \(\dot{\mathbf{q}}\) 的系数（权重）矩阵。
-3. 余下只需求出每一列权重（见 A.2），再代入杆臂坐标展开成 §1.1.6 的数值公式（见 A.3）。
+3. 余下只需求出每一列权重（见 A.2），再代入杆臂坐标展开成 §1.1.4 的数值公式（见 A.3）。
 
 ## A.2 各列权重的几何求法（杆臂转 \(\pi/2\)）
 
@@ -94,21 +94,21 @@ $$
 \qquad \mathbf{r}_i=\mathbf{p}_{\text{tip}}-\mathbf{p}_i
 $$
 
-把 §1.1.4 的 \(\dot{\alpha}_i(\dot{\mathbf{q}})\) 代入，按 \(\dot{q}_j\) 归并系数，得到的正是上表各列权重——与「逐列选中心、杆臂转 \(\pi/2\)」同一结果。
+把 §1.1.2 的 \(\dot{\alpha}_i(\dot{\mathbf{q}})\) 代入，按 \(\dot{q}_j\) 归并系数，得到的正是上表各列权重——与「逐列选中心、杆臂转 \(\pi/2\)」同一结果。
 
 ## A.3 权重展开成矩阵
 
-**结论.** 把 §1.1.5 的杆臂差向量代入 A.2 的通式，逐列即得 §1.1.6 的 \(J_{\text{tip}}\)；\(J_{\text{toe}}\) 只需在所有杆臂中截去 \(l_4\)，第 6 列自然为 0。
+**结论.** 把 §1.1.3 的杆臂差向量代入 A.2 的通式，逐列即得 §1.1.4 的 \(J_{\text{tip}}\)；\(J_{\text{toe}}\) 只需在所有杆臂中截去 \(l_4\)，第 6 列自然为 0。
 
-**推导.** 三个转动中心对应杆臂 \(\mathbf{p}_{\text{tip}}-\mathbf{p}_1\)、\(\mathbf{p}_{\text{tip}}-\mathbf{p}_2\)、\(\mathbf{p}_{\text{tip}}-\mathbf{p}_4\)，其坐标由 §1.1.5 直接给出；左乘 \(R_Z(\pi/2)\)，即 \((r_x,r_y)\mapsto(-r_y,\ r_x)\)，再按列排列。成品矩阵只在 §1.1.6 定稿，此处不重复。
+**推导.** 三个转动中心对应杆臂 \(\mathbf{p}_{\text{tip}}-\mathbf{p}_1\)、\(\mathbf{p}_{\text{tip}}-\mathbf{p}_2\)、\(\mathbf{p}_{\text{tip}}-\mathbf{p}_4\)，其坐标由 §1.1.3 直接给出；左乘 \(R_Z(\pi/2)\)，即 \((r_x,r_y)\mapsto(-r_y,\ r_x)\)，再按列排列。成品矩阵只在 §1.1.4 定稿，此处不重复。
 
 ## A.4 极限工况（检验权重列）
 
-**结论.** 下列极限必须与 A.1–A.3 / §1.1.6 一致（单测）：
+**结论.** 下列极限必须与 A.1–A.3 / §1.1.4 一致（单测）：
 
 1. 仅 \(\dot{q}_1,\dot{q}_2\)：\(\dot{\mathbf{p}}_{\text{tip}}=[\dot{q}_1,\dot{q}_2]^T\)，前两列权重 \(=\mathbf{I}_2\)。
 2. 仅 \(\dot{q}_6\)：\(\lVert\dot{\mathbf{p}}_{\text{tip}}\rVert=l_4\lvert\dot{q}_6\rvert\)，方向垂直脚趾（第 6 列 = 趾杆臂转 \(\pi/2\)）。
 3. \(\dot{q}_4=-\dot{q}_3\) 其余零：\(\dot{\alpha}_i\equiv 0\Rightarrow\dot{\mathbf{p}}_{\text{tip}}=\mathbf{0}\)，第 3、4 列权重相同故抵消。
 4. \(\alpha_i=0\)：转动列权重 \(=[0,\sum l_i]^T\)，杆臂沿 \(+X\)，转 \(\pi/2\) 后切向纯竖直。
 
-**推导.** 把特殊 \(\dot{\mathbf{q}}\) 或 \(\alpha_i\) 代入 \(\dot{\mathbf{p}}_{\text{tip}}=J\dot{\mathbf{q}}\)（A.2 / §1.1.6），化简即得。
+**推导.** 把特殊 \(\dot{\mathbf{q}}\) 或 \(\alpha_i\) 代入 \(\dot{\mathbf{p}}_{\text{tip}}=J\dot{\mathbf{q}}\)（A.2 / §1.1.4），化简即得。

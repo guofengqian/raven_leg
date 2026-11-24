@@ -1,4 +1,4 @@
-> 返回总目录：[paper_spec.md](../../paper_spec.md) | 正文对应：[第 3 章](../03_浮基多体动力学方程.md)（外力项见 [第 2 章](../02_关节扭簧与执行器外特性模型.md)）
+> 返回总目录：[paper_spec.md](../../paper_spec.md) | 正文对应：[第 3 章](../03_受约束浮基多刚体动力学.md)（外力项见 [第 2 章](../02_执行机构与被动储能外特性.md)）
 
 # 附录 D. 运动方程直观解释（小白向）
 
@@ -77,7 +77,7 @@
 | \(\boldsymbol{\tau}\) | \(\mathbb{R}^2\) | N·m，N·m | 髋、踝两路电机关节侧力矩 |
 | \(\mathbf{S}^T\) | \(6\times 2\) | 无量纲（0/1 选择） | 只把 \(\boldsymbol{\tau}\) 写进 \(q_4,q_5\) 两个槽 |
 | \(\mathbf{S}^T\boldsymbol{\tau}\) | \(\mathbb{R}^6\) | 仅第 4、5 分量为 N·m，其余为 0 | 驱动广义力 |
-| \(\mathbf{f}_{\text{ext}}\) | \(\mathbb{R}^6\) | 广义力：N 或 N·m（按行） | \(\boldsymbol{\tau}_{\text{spring}}+\mathbf{f}_w+\mathbf{f}_t+\mathbf{f}_p\)（见第 2 章）；**不含** \(\mathbf{S}^T\boldsymbol{\tau}\) |
+| \(\mathbf{f}_{\text{ext}}\) | \(\mathbb{R}^6\) | 广义力：N 或 N·m（按行） | \(\mathbf{f}_p+\mathbf{f}_w+\mathbf{f}_t+\boldsymbol{\tau}_a+\boldsymbol{\tau}_t\)（式 (11)，见第 2 章）；**不含** \(\mathbf{S}^T\boldsymbol{\tau}\) |
 | \(\mathbf{F}_{w/t}\) | \(\mathbb{R}^2\) | N，N | 压心处气动力（世界系 \(x,y\)） |
 | \(\mathbf{J}_{w/t}\) | \(2\times 6\) | 同点雅可比：映到 m/s | \(\mathbf{f}_{w/t}=\mathbf{J}_{w/t}^T\mathbf{F}_{w/t}\) |
 | \(\boldsymbol{\tau}_a,\boldsymbol{\tau}_t\) | 嵌入 \(\mathbb{R}^6\) | 分别只在 \(q_5\)、\(q_6\) 槽为 N·m | 扭簧广义力矩 |
