@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 460" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <!-- 阴影与渐变 -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="link1Grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="link2Grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="link2LightGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <!-- 箭头 -->
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- 总体背景面板 -->
+  <rect x="15" y="15" width="990" height="430" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+
+  <!-- 顶部主标题 -->
+  <text x="35" y="48" font-size="20" font-weight="700" fill="#0f172a">图 2.2a 踝关节单向嵌位扭簧机构示意图（标准两端杆件安装）</text>
+  <text x="35" y="70" font-size="13" fill="#64748b">扭簧同轴套在踝关节铰链轴上：一端固定在小腿杆（杆1），另一端贴合在足部杆（杆2）的单向挡销上</text>
+
+  <!-- ==================== 左栏：屈曲深蹲储能状态 ==================== -->
+  <g transform="translate(30, 85)">
+    <!-- 卡片背景 -->
+    <rect x="0" y="0" width="465" height="340" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+    <rect x="0" y="0" width="465" height="36" rx="10" fill="#dbeafe"/>
+    <path d="M0 26 h465 v10 h-465 z" fill="#dbeafe"/>
+    <text x="18" y="24" font-size="14.5" font-weight="700" fill="#1e40af">1. 屈曲深蹲储能区（q₅ &lt; q₅,₀，两端受两杆挤压卷紧）</text>
+
+    <!-- 几何铰链中心处于 (160, 190) -->
+
+    <!-- 自由松弛角 q₅,₀ 基准参考虚线 -->
+    <line x1="160" y1="190" x2="380" y2="255" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="385" y="260" font-size="12" fill="#64748b">松弛平衡位 q₅,₀</text>
+
+    <!-- 角度变形弧线 -->
+    <path d="M 285 227 A 130 130 0 0 0 290 190" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrowOrange)"/>
+    <text x="300" y="215" font-size="12.5" font-weight="700" fill="#c2410c">压缩角 Δq = q₅,₀ - q₅</text>
+
+    <!-- 连杆 1：小腿杆 (Tibiotarsus，固定侧) -->
+    <!-- 杆身槽体 -->
+    <line x1="60" y1="65" x2="160" y2="190" stroke="url(#link1Grad)" stroke-width="20" stroke-linecap="round"/>
+    <text x="35" y="75" font-size="13" font-weight="700" fill="#1e293b">小腿杆 1 (Tibiotarsus)</text>
+
+    <!-- 连杆 2：足部杆 (Tarsometatarsus，运动侧，屈曲水平位) -->
+    <line x1="160" y1="190" x2="360" y2="190" stroke="url(#link2Grad)" stroke-width="18" stroke-linecap="round"/>
+    <text x="340" y="172" font-size="13" font-weight="700" fill="#1d4ed8">足部杆 2 (Tarsometatarsus)</text>
+
+    <!-- 杆 2 上的单向限位推销 (Stopper Pin) -->
+    <circle cx="280" cy="180" r="6" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <text x="250" y="156" font-size="11.5" font-weight="600" fill="#b45309">单向限位销</text>
+
+    <!-- 关节旋转中心铰链 (Hinge Joint Pin) -->
+    <circle cx="160" cy="190" r="22" fill="#cbd5e1" stroke="#334155" stroke-width="2.5"/>
+    <circle cx="160" cy="190" r="7" fill="#1e293b"/>
+
+    <!-- ================= 标准扭簧绘制 ================= -->
+    <!-- 扭簧端 1：沿着小腿杆 1 紧密贴合并由销套固定 -->
+    <line x1="85" y1="96" x2="148" y2="175" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- 杆 1 上的弹簧固定卡扣 (Anchor Clip) -->
+    <rect x="80" y="90" width="16" height="12" rx="3" fill="#ea580c" stroke="#9a3412" stroke-width="1"/>
+    <text x="15" y="125" font-size="11.5" font-weight="600" fill="#c2410c">端头 1: 固接在杆 1</text>
+    <path d="M 80 120 L 85 105" fill="none" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+    <!-- 扭簧中心螺旋圈 (Coiled Body 套在轴上) -->
+    <path d="M 148 175 A 16 16 0 1 1 176 195 A 19 19 0 1 1 142 188 A 22 22 0 1 1 178 202" fill="none" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+
+    <!-- 扭簧端 2：沿着足部杆 2 延伸，紧密推压在杆 2 的单向挡销上 -->
+    <path d="M 178 202 L 280 186" fill="none" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+    <text x="225" y="218" font-size="11.5" font-weight="600" fill="#c2410c">端头 2: 压在杆 2 销上</text>
+
+    <!-- 恢复力矩箭头 -->
+    <path d="M 230 145 A 60 60 0 0 1 285 168" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+    <text x="235" y="132" font-size="13" font-weight="700" fill="#1d4ed8">τₐ = kₐ(q₅,₀ - q₅)</text>
+
+    <!-- 底部状态说明条 -->
+    <rect x="15" y="280" width="435" height="48" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1"/>
+    <text x="25" y="300" font-size="12" font-weight="700" fill="#1e40af">✔ 两端分别受两杆挤压：弹簧圈受扭蓄能</text>
+    <text x="25" y="318" font-size="11.5" fill="#3b82f6">小腿下压深蹲时两杆夹角缩小，弹簧两臂被迫卷紧，积蓄弹性势能 Vₐ &gt; 0</text>
+  </g>
+
+  <!-- ==================== 右栏：蹬伸脱嵌状态 ==================== -->
+  <g transform="translate(525, 85)">
+    <!-- 卡片背景 -->
+    <rect x="0" y="0" width="465" height="340" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="0" y="0" width="465" height="36" rx="10" fill="#f1f5f9"/>
+    <path d="M0 26 h465 v10 h-465 z" fill="#f1f5f9"/>
+    <text x="18" y="24" font-size="14.5" font-weight="700" fill="#475569">2. 伸展脱嵌区（q₅ ≥ q₅,₀，端头 2 脱离杆 2 挡销）</text>
+
+    <!-- 几何铰链中心处于 (160, 190) -->
+
+    <!-- 连杆 1：小腿杆 (Tibiotarsus，姿态固定不变) -->
+    <line x1="60" y1="65" x2="160" y2="190" stroke="url(#link1Grad)" stroke-width="20" stroke-linecap="round"/>
+    <text x="35" y="75" font-size="13" font-weight="700" fill="#1e293b">小腿杆 1 (Tibiotarsus)</text>
+
+    <!-- 连杆 2：足部杆 (大角度蹬伸，朝右下大幅转动) -->
+    <line x1="160" y1="190" x2="335" y2="295" stroke="url(#link2LightGrad)" stroke-width="18" stroke-linecap="round"/>
+    <text x="325" y="320" font-size="13" font-weight="700" fill="#2563eb">足部杆 2 (蹬出伸展)</text>
+
+    <!-- 自由松弛角 q₅,₀ 基准参考虚线 -->
+    <line x1="160" y1="190" x2="380" y2="255" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="385" y="255" font-size="12" fill="#64748b">松弛平衡位 q₅,₀</text>
+
+    <!-- 杆 2 上的限位推销 (已随杆 2 转到下方，离开弹簧) -->
+    <circle cx="280" cy="262" r="6" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <text x="295" y="265" font-size="11.5" font-weight="600" fill="#b45309">杆 2 限位销脱开</text>
+
+    <!-- 关节旋转中心铰链 -->
+    <circle cx="160" cy="190" r="22" fill="#cbd5e1" stroke="#334155" stroke-width="2.5"/>
+    <circle cx="160" cy="190" r="7" fill="#1e293b"/>
+
+    <!-- ================= 扭簧处于松弛自由状态 ================= -->
+    <!-- 扭簧端 1：依旧固定在杆 1 上 -->
+    <line x1="85" y1="96" x2="148" y2="175" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+    <rect x="80" y="90" width="16" height="12" rx="3" fill="#94a3b8"/>
+    <text x="15" y="125" font-size="11.5" fill="#64748b">端头 1 固连于杆 1</text>
+
+    <!-- 扭簧中心螺旋圈 (已弹回中立自由松弛状态) -->
+    <path d="M 148 175 A 16 16 0 1 1 176 195 A 19 19 0 1 1 142 188 A 22 22 0 1 1 178 202" fill="none" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+
+    <!-- 扭簧端 2：停留在自然平衡角 q₅,₀ 挡槽，不再跟随杆 2 转动 -->
+    <path d="M 178 202 L 290 235" fill="none" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="290" cy="235" r="3.5" fill="#94a3b8"/>
+    <text x="210" y="222" font-size="11.5" fill="#64748b">端头 2 停留在 q₅,₀</text>
+
+    <!-- 脱开间隙双向标记 (Gap) -->
+    <line x1="288" y1="239" x2="282" y2="256" stroke="#ef4444" stroke-width="2.5"/>
+    <path d="M 240 258 L 275 248" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="175" y="270" font-size="12" font-weight="700" fill="#dc2626">单向脱嵌间隙 (Gap)</text>
+
+    <!-- 底部状态说明条 -->
+    <rect x="15" y="280" width="435" height="48" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="25" y="300" font-size="12" font-weight="700" fill="#475569">✔ 端头 2 脱离杆 2 接触：机构脱嵌</text>
+    <text x="25" y="318" font-size="11.5" fill="#64748b">杆 2 伸展超越 q₅,₀ 后销钉与弹簧分离，无反向约束力矩 τₐ = 0，Vₐ = 0</text>
+  </g>
+</svg>

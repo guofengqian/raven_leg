@@ -1,0 +1,92 @@
+/* raven_leg Markdown 预览：冷钢蓝标题 + 暖灰正文 */
+
+:root {
+  --md-body: #2c333a;
+  --md-muted: #5c6570;
+  --md-h1: #1b3a5f;
+  --md-h2: #245b8a;
+  --md-h3: #2f7aa8;
+  --md-h4: #3a8bb8;
+  --md-rule: #d7e3ef;
+  --md-code-bg: #f2f5f8;
+  --md-table-border: #d0d7de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-body: #d7dce2;
+    --md-muted: #9aa3ad;
+    --md-h1: #8ec5f0;
+    --md-h2: #6bb0e3;
+    --md-h3: #5a9bcf;
+    --md-h4: #4f8fc4;
+    --md-rule: #3a4a5a;
+    --md-code-bg: #1e252c;
+    --md-table-border: #3a4550;
+  }
+}
+
+body {
+  color: var(--md-body);
+  line-height: 1.65;
+}
+
+h1 {
+  color: var(--md-h1);
+  border-bottom: 1px solid var(--md-rule);
+  padding-bottom: 0.25em;
+  font-weight: 700;
+}
+
+h2 {
+  color: var(--md-h2);
+  font-weight: 700;
+}
+
+h3 {
+  color: var(--md-h3);
+  font-weight: 650;
+}
+
+h4,
+h5,
+h6 {
+  color: var(--md-h4);
+  font-weight: 600;
+}
+
+p,
+li,
+td,
+th {
+  color: var(--md-body);
+}
+
+blockquote {
+  color: var(--md-muted);
+  border-left: 3px solid var(--md-rule);
+}
+
+/* 页眉导航、次要说明 */
+body > blockquote:first-child,
+hr + p {
+  color: var(--md-muted);
+}
+
+/* 加粗只加重字重，不上色，避免正文大片变绿 */
+strong {
+  color: inherit;
+  font-weight: 650;
+}
+
+code {
+  background: var(--md-code-bg);
+}
+
+table {
+  border-color: var(--md-table-border);
+}
+
+th {
+  color: var(--md-h2);
+}

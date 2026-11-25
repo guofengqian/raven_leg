@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 460" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <!-- 阴影与渐变 -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="palmGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="toeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <!-- 箭头 -->
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c"/>
+    </marker>
+  </defs>
+
+  <!-- 总体背景面板 -->
+  <rect x="15" y="15" width="990" height="430" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+
+  <!-- 顶部主标题 -->
+  <text x="35" y="48" font-size="20" font-weight="700" fill="#0f172a">图 2.3a 脚趾双向顺应扭簧机构示意图（标准两端杆件安装）</text>
+  <text x="35" y="70" font-size="13" fill="#64748b">扭簧同轴套在脚趾铰链轴上：端头 1 固连在足掌杆（杆 1），端头 2 固连在脚趾杆（杆 2），始终双向联动</text>
+
+  <!-- ==================== 左栏：触地背屈顺应 ==================== -->
+  <g transform="translate(30, 85)">
+    <!-- 卡片背景 -->
+    <rect x="0" y="0" width="465" height="340" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+    <rect x="0" y="0" width="465" height="36" rx="10" fill="#dcfce7"/>
+    <path d="M0 26 h465 v10 h-465 z" fill="#dcfce7"/>
+    <text x="18" y="24" font-size="14.5" font-weight="700" fill="#166534">1. 触地背屈顺应区（q₆ &gt; q₆,₀，两端随两杆弯折受扭）</text>
+
+    <!-- 地表虚线 (Ground) -->
+    <line x1="25" y1="240" x2="440" y2="240" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <text x="365" y="258" font-size="12" fill="#64748b">地面接触线</text>
+
+    <!-- 几何铰链中心处于 (200, 215) -->
+
+    <!-- 连杆 1：足掌杆 (Palm，水平贴地) -->
+    <line x1="50" y1="215" x2="200" y2="215" stroke="url(#palmGrad)" stroke-width="18" stroke-linecap="round"/>
+    <text x="45" y="190" font-size="13" font-weight="700" fill="#1e293b">足掌杆 1 (Palm)</text>
+
+    <!-- 连杆 2：脚趾杆 (Toes，触地受力向上翘起背屈) -->
+    <line x1="200" y1="215" x2="350" y2="155" stroke="url(#toeGrad)" stroke-width="16" stroke-linecap="round"/>
+    <text x="330" y="140" font-size="13" font-weight="700" fill="#15803d">脚趾杆 2 (Toes)</text>
+
+    <!-- 平衡角 q₆,₀ 基准参考虚线 -->
+    <line x1="200" y1="215" x2="365" y2="215" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="370" y="218" font-size="12" fill="#64748b">平衡基准位 q₆,₀</text>
+
+    <!-- 偏转角标注 -->
+    <path d="M 285 215 A 85 85 0 0 0 275 185" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrowOrange)"/>
+    <text x="290" y="200" font-size="12" font-weight="700" fill="#c2410c">Δq = q₆ - q₆,₀</text>
+
+    <!-- 脚趾铰链旋转中心 (Toe Joint Hinge) -->
+    <circle cx="200" cy="215" r="18" fill="#cbd5e1" stroke="#334155" stroke-width="2.5"/>
+    <circle cx="200" cy="215" r="6" fill="#1e293b"/>
+
+    <!-- ================= 标准双向扭簧绘制 ================= -->
+    <!-- 扭簧端 1：完全紧固在足掌杆 1 上 -->
+    <line x1="110" y1="208" x2="190" y2="208" stroke="#16a34a" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- 杆 1 紧固卡夹 -->
+    <rect x="100" y="202" width="16" height="12" rx="3" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
+    <text x="65" y="235" font-size="11" font-weight="600" fill="#166534">端头 1 固连在杆 1</text>
+
+    <!-- 扭簧中心螺旋圈 (受扭卷紧) -->
+    <path d="M 190 208 A 13 13 0 1 1 213 218 A 16 16 0 1 1 187 210 A 19 19 0 1 1 216 222" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- 扭簧端 2：完全紧固在脚趾杆 2 上 -->
+    <path d="M 216 222 L 290 192" fill="none" stroke="#16a34a" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- 杆 2 紧固卡夹 -->
+    <rect x="285" y="186" width="14" height="14" rx="3" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
+    <text x="260" y="172" font-size="11" font-weight="600" fill="#166534">端头 2 固连在杆 2</text>
+
+    <!-- 下压恢复力矩箭头 -->
+    <path d="M 260 148 A 50 50 0 0 1 275 180" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowRed)"/>
+    <text x="235" y="125" font-size="13" font-weight="700" fill="#dc2626">恢复力矩 τₜ = -kₜ(q₆ - q₆,₀) &lt; 0</text>
+
+    <!-- 底部状态说明条 -->
+    <rect x="15" y="280" width="435" height="48" rx="6" fill="#ffffff" stroke="#86efac" stroke-width="1"/>
+    <text x="25" y="300" font-size="12" font-weight="700" fill="#166534">✔ 两端双向分别固接在两根杆上</text>
+    <text x="25" y="318" font-size="11.5" fill="#15803d">脚趾受地面反力抬起时迫使弹簧卷紧，产生向下压地力矩，增大支撑面积</text>
+  </g>
+
+  <!-- ==================== 右栏：离地腾空复位 ==================== -->
+  <g transform="translate(525, 85)">
+    <!-- 卡片背景 -->
+    <rect x="0" y="0" width="465" height="340" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="0" y="0" width="465" height="36" rx="10" fill="#f1f5f9"/>
+    <path d="M0 26 h465 v10 h-465 z" fill="#f1f5f9"/>
+    <text x="18" y="24" font-size="14.5" font-weight="700" fill="#334155">2. 离地腾空复位态（q₆ = q₆,₀，弹力驱动杆 2 拉平）</text>
+
+    <!-- 悬空高度参考虚线 -->
+    <line x1="25" y1="285" x2="440" y2="285" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="365" y="303" font-size="12" fill="#94a3b8">空中悬浮基准</text>
+
+    <!-- 几何铰链中心处于 (200, 200) -->
+
+    <!-- 连杆 1：足掌杆 (Palm，腾空悬浮) -->
+    <line x1="50" y1="200" x2="200" y2="200" stroke="url(#palmGrad)" stroke-width="18" stroke-linecap="round"/>
+    <text x="45" y="175" font-size="13" font-weight="700" fill="#1e293b">足掌杆 1 (Palm)</text>
+
+    <!-- 连杆 2：脚趾杆 (被扭簧拉回自然平直位) -->
+    <line x1="200" y1="200" x2="350" y2="200" stroke="url(#toeGrad)" stroke-width="16" stroke-linecap="round"/>
+    <text x="330" y="175" font-size="13" font-weight="700" fill="#15803d">脚趾杆 2 (平直中立)</text>
+
+    <!-- 弹性回弹驱动箭头 -->
+    <path d="M 290 160 A 35 35 0 0 1 300 185" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="3 3" marker-end="url(#arrowGreen)"/>
+    <text x="310" y="155" font-size="11.5" font-weight="600" fill="#16a34a">双向弹力自动复位</text>
+
+    <!-- 脚趾铰链旋转中心 -->
+    <circle cx="200" cy="200" r="18" fill="#cbd5e1" stroke="#334155" stroke-width="2.5"/>
+    <circle cx="200" cy="200" r="6" fill="#1e293b"/>
+
+    <!-- ================= 扭簧处于松弛平衡状态 ================= -->
+    <!-- 扭簧端 1：固连在杆 1 上 -->
+    <line x1="110" y1="193" x2="190" y2="193" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>
+    <rect x="100" y="187" width="16" height="12" rx="3" fill="#64748b"/>
+    <text x="65" y="220" font-size="11" fill="#64748b">端头 1 固连在杆 1</text>
+
+    <!-- 扭簧中心螺旋圈 (恢复松弛) -->
+    <path d="M 190 193 A 13 13 0 1 1 213 203 A 16 16 0 1 1 187 195 A 19 19 0 1 1 216 207" fill="none" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- 扭簧端 2：固连在杆 2 上 -->
+    <path d="M 216 207 L 290 193" fill="none" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>
+    <rect x="285" y="187" width="14" height="14" rx="3" fill="#64748b"/>
+    <text x="260" y="220" font-size="11" fill="#64748b">端头 2 固连在杆 2</text>
+
+    <!-- 底部状态说明条 -->
+    <rect x="15" y="280" width="435" height="48" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="25" y="300" font-size="12" font-weight="700" fill="#334155">✔ 恒定固接无脱嵌：双向弹力使两杆共轴复位</text>
+    <text x="25" y="318" font-size="11.5" fill="#64748b">离地后无地表反力约束，扭簧两端驱动两杆回到平衡夹角 q₆,₀，τₜ = 0</text>
+  </g>
+</svg>

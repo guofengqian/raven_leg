@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <!-- 阴影与渐变 -->
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.06"/>
+    </filter>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="tailGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+    
+    <!-- 箭头标记 -->
+    <marker id="arrRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#9333ea"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrSlate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <!-- 顶部主标题 -->
+  <text x="35" y="38" font-size="20" font-weight="700" fill="#0f172a">图 2.5 机身气动与推力点外力向 6 维广义坐标映射机制示意图</text>
+  <text x="35" y="60" font-size="13" fill="#64748b">基于虚功原理 δW = F·δp = f_ext·δq 的作用点雅可比转置映射（J^T F）</text>
+
+  <!-- ======================== 左侧面板：机身几何与外力作用点 ======================== -->
+  <rect x="25" y="78" width="540" height="422" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <rect x="25" y="78" width="540" height="34" rx="12" fill="#f1f5f9"/>
+  <text x="40" y="100" font-size="14" font-weight="600" fill="#334155">1. 机身坐标系 (O_B)、固连压心与笛卡尔空间点力</text>
+
+  <!-- 坐标基准轴展示 (世界系基底提示) -->
+  <g transform="translate(60, 440)">
+    <line x1="0" y1="0" x2="45" y2="0" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+    <line x1="0" y1="0" x2="0" y2="-45" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+    <text x="50" y="4" font-size="12" font-weight="600" fill="#64748b">+X (世界水平)</text>
+    <text x="-5" y="-52" font-size="12" font-weight="600" fill="#64748b">+Y (世界竖直)</text>
+  </g>
+
+  <!-- 机身与力学构型图形组 (绕髋关节旋转俯仰角 q3) -->
+  <g id="aircraft_geometry" transform="translate(230, 270)">
+    <!-- 水平虚线与机身仰角 q3 示意 -->
+    <line x1="-150" y1="0" x2="180" y2="0" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <path d="M 50 0 A 50 50 0 0 0 47 -17" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrRed)"/>
+    <text x="56" y="-6" font-size="13" font-weight="700" fill="#ea580c">q₃ (俯仰角)</text>
+
+    <!-- 机身主梁 (沿机身轴旋转约 -20 度，表示抬头 q3=20°) -->
+    <g transform="rotate(-20)">
+      <!-- 机身轮廓线 -->
+      <line x1="-150" y1="0" x2="150" y2="0" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+      <!-- 机身本体厚度条 -->
+      <rect x="-140" y="-8" width="280" height="16" rx="8" fill="url(#bodyGrad)"/>
+      <text x="80" y="-14" font-size="12" font-weight="600" fill="#475569">机身纵轴 +x_B</text>
+
+      <!-- 螺旋桨与推力 F_p (位于机头 x ≈ 140) -->
+      <g transform="translate(140, 0)">
+        <ellipse cx="0" cy="0" rx="4" ry="24" fill="#059669" opacity="0.6"/>
+        <circle cx="0" cy="0" r="4" fill="#0f172a"/>
+        <!-- 推力方向偏角 θ_p -->
+        <g transform="rotate(-7)">
+          <line x1="0" y1="0" x2="60" y2="0" stroke="#16a34a" stroke-width="3" marker-end="url(#arrGreen)"/>
+          <text x="65" y="4" font-size="13" font-weight="700" fill="#16a34a">F_p (推力)</text>
+        </g>
+        <text x="-25" y="32" font-size="11" fill="#059669">旋翼轴点</text>
+      </g>
+
+      <!-- 机翼与气动力 F_w (位于压心 P_w: x ≈ -15, y ≈ 25 在背侧) -->
+      <!-- 注意：在旋转坐标系中，y为背侧负方向 -->
+      <g transform="translate(-15, -28)">
+        <!-- 压心位置标注 -->
+        <rect x="-24" y="-5" width="48" height="10" rx="3" fill="url(#wingGrad)"/>
+        <circle cx="0" cy="0" r="4.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+        <text x="-48" y="-10" font-size="12" font-weight="700" fill="#0284c7">P_w (机翼压心)</text>
+        
+        <!-- 世界系下的升阻力合力 F_w (相对机身抬头，向上偏后) -->
+        <line x1="0" y1="0" x2="10" y2="-65" stroke="#0284c7" stroke-width="3" marker-end="url(#arrBlue)"/>
+        <text x="16" y="-62" font-size="13" font-weight="700" fill="#0284c7">F_w (机翼气动力)</text>
+        
+        <!-- 分解说明：升力与阻力 -->
+        <path d="M 0 0 L 25 -25 L 10 -65" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="32" y="-30" font-size="10" fill="#0369a1">合力 = 升力 + 阻力</text>
+      </g>
+
+      <!-- 尾翼与气动力 F_t (位于压心 P_t: x ≈ -115, y ≈ 40 在背侧) -->
+      <g transform="translate(-115, -42)">
+        <rect x="-16" y="-4" width="32" height="8" rx="2" fill="url(#tailGrad)"/>
+        <circle cx="0" cy="0" r="4" fill="#9333ea" stroke="#ffffff" stroke-width="1.5"/>
+        <text x="-55" y="-12" font-size="12" font-weight="700" fill="#9333ea">P_t (尾翼压心)</text>
+        
+        <!-- 尾翼气动力 F_t -->
+        <line x1="0" y1="0" x2="5" y2="-45" stroke="#9333ea" stroke-width="2.5" marker-end="url(#arrPurple)"/>
+        <text x="12" y="-42" font-size="12" font-weight="700" fill="#9333ea">F_t (尾翼气动力)</text>
+      </g>
+    </g>
+
+    <!-- 髋关节原点 O_B (位于机身 (0,0)) -->
+    <circle cx="0" cy="0" r="8" fill="#ea580c" stroke="#ffffff" stroke-width="2.5"/>
+    <text x="-15" y="24" font-size="13" font-weight="700" fill="#c2410c">O_B 髋关节 [q₁, q₂]ᵀ</text>
+    <text x="-15" y="38" font-size="11" fill="#64748b">本体系原点 (广义坐标浮基)</text>
+
+    <!-- 力臂矢量示意 (从髋点指向机翼压心 r_w) -->
+    <!-- 经 -20度旋转后 P_w 约在 (-23, -21) -->
+    <line x1="0" y1="0" x2="-23" y2="-21" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <text x="-70" y="-12" font-size="11" font-weight="600" fill="#ea580c">力臂 r_w</text>
+
+    <!-- 腿部铰接虚影 (示意腿部连杆与机身力的解耦) -->
+    <g stroke="#94a3b8" stroke-width="3" stroke-linecap="round" opacity="0.6">
+      <line x1="0" y1="0" x2="20" y2="55"/>
+      <circle cx="20" cy="55" r="4" fill="#94a3b8"/>
+      <line x1="20" y1="55" x2="-10" y2="105"/>
+      <circle cx="-10" cy="105" r="3" fill="#94a3b8"/>
+      <line x1="-10" y1="105" x2="15" y2="115"/>
+    </g>
+    <rect x="28" y="70" width="135" height="26" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="34" y="87" font-size="11" fill="#64748b">腿部连杆 (q₄, q₅, q₆)</text>
+    <text x="34" y="112" font-size="11" font-weight="600" fill="#dc2626">不承受机身外力直接力矩</text>
+  </g>
+
+  <!-- ======================== 右侧面板：6 维广义力映射解析 ======================== -->
+  <rect x="580" y="78" width="395" height="422" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <rect x="580" y="78" width="395" height="34" rx="12" fill="#f1f5f9"/>
+  <text x="595" y="100" font-size="14" font-weight="600" fill="#334155">2. 6 维广义外力 f_ext 的逐行物理分解与意义</text>
+
+  <!-- 卡片 1：水平平动自由度 q1 -->
+  <g transform="translate(595, 122)">
+    <rect width="365" height="52" rx="8" fill="#f0f9ff" stroke="#bae6fd"/>
+    <text x="12" y="22" font-size="13" font-weight="700" fill="#0369a1">分量 1 (q₁: 髋水平平动)  ➜  f₁ = Σ F_x</text>
+    <text x="12" y="42" font-size="12" fill="#0284c7">机身平动雅可比导数为 1；所有外力水平分量直接线性叠加。</text>
+  </g>
+
+  <!-- 卡片 2：竖直平动自由度 q2 -->
+  <g transform="translate(595, 184)">
+    <rect width="365" height="52" rx="8" fill="#f0f9ff" stroke="#bae6fd"/>
+    <text x="12" y="22" font-size="13" font-weight="700" fill="#0369a1">分量 2 (q₂: 髋竖直平动)  ➜  f₂ = Σ F_y</text>
+    <text x="12" y="42" font-size="12" fill="#0284c7">包含推力竖直分量与两翼升力；直接驱动全机垂向加速起跳。</text>
+  </g>
+
+  <!-- 卡片 3：俯仰转动自由度 q3 (力矩) -->
+  <g transform="translate(595, 246)">
+    <rect width="365" height="74" rx="8" fill="#fef3c7" stroke="#fde68a"/>
+    <text x="12" y="22" font-size="13" font-weight="700" fill="#b45309">分量 3 (q₃: 机身俯仰)  ➜  f₃ = Σ (r_x F_y − r_y F_x)</text>
+    <text x="12" y="42" font-size="12" fill="#92400e">外力对髋关节原点 O_B 的俯仰力矩！</text>
+    <text x="12" y="60" font-size="11" fill="#78350f">转动雅可比 [-(y-q₂), (x-q₁)] 恰与力向量相乘构成平面力矩叉积。</text>
+  </g>
+
+  <!-- 卡片 4：腿部关节自由度 q4, q5, q6 -->
+  <g transform="translate(595, 330)">
+    <rect width="365" height="82" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <text x="12" y="22" font-size="13" font-weight="700" fill="#475569">分量 4, 5, 6 (q₄ 大腿, q₅ 踝, q₆ 趾)</text>
+    <text x="12" y="42" font-size="12" fill="#334155">• 机身点外力贡献：<tspan font-weight="700" fill="#dc2626">恒为 0</tspan>（机翼位置不依赖腿杆转角）</text>
+    <text x="12" y="62" font-size="12" fill="#334155">• 扭簧被动力矩补充：f₅ 嵌入 τ_a(q₅)，f₆ 嵌入 τ_t(q₆)</text>
+  </g>
+
+  <!-- 底部汇总提示 -->
+  <g transform="translate(595, 424)">
+    <rect width="365" height="66" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#047857">论文式 (11) 最终装配流向：</text>
+    <text x="12" y="40" font-size="11" fill="#065f46">f_ext = J_p^T F_p + J_w^T F_w + J_t^T F_t + [0, 0, 0, 0, τ_a, τ_t]^T</text>
+    <text x="12" y="56" font-size="11" fill="#059669">作为已知广义力直接代入多体动力学方程 M q̈ + C q̇ + g = S^T τ + f_ext</text>
+  </g>
+</svg>

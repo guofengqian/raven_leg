@@ -1,17 +1,22 @@
 # EPFL RAVEN 跳跃起飞纯数学动力学仿真 (Jumping Takeoff Dynamics Simulation)
 
-本项目旨在通过纯 Python 科学计算栈，数学复现洛桑联邦理工学院（EPFL）在论文 `reference/Fast ground-to-air transition with avian-inspired multifunctional legs.pdf` 里的**蹬地跳跃（Jumping）及跳跃辅助起飞（Jumping Takeoff）**动力学全过程。
+本项目旨在通过纯 Python 科学计算栈，复现 EPFL 论文 `reference/Fast ground-to-air transition with avian-inspired multifunctional legs.pdf` 中的蹬地跳跃及跳跃辅助起飞动力学。论文原始证据以 PDF 为准，确认后的参数以 `config/robot_paras.yaml` 为准，公式与符号以 `doc/paper_spec.md` 为准，验收口径以 `plan/milestone.md` 为准；本 README 只作导航。
+
+## 当前进度
+
+- 已有实现：`src/kinematics.py`。
+- 已有验证：`tests/test_step1.py`。
+- 尚未实现：执行器、完整动力学、混合状态机和基准运行入口。仓库目录树中的这些文件是计划交付物，不代表已经完成。
+- Step 3 动力学实现受缺失参数阻塞；具体项目、状态及处理规则见 [`doc/missing_params_log.md`](doc/missing_params_log.md)。
+- 下一步：继续按 [`plan/milestone.md`](plan/milestone.md) 的顺序推进当前未完成步骤；不得将未确认参数作为默认值使用。
 
 ---
 
 ## 1. 核心复现目标与物理边界
 
-* **物理建模范畴**：矢状面（x-z 平面）浮基多连杆刚体动力学 + 弹簧储能释放 + 被动弹性脚趾 + 触地/腾空混合动力切换（Hybrid Dynamical System）+ 螺旋桨推力与固定翼准定常气动模型。
+* **物理建模范畴**：世界系 (X)-(Y) 矢状面浮基多连杆刚体动力学；(+Y) 为竖直向上，(Z) 为面外方向。旧材料中的 `z` / `Fz` 在注明的兼容语境下表示竖直量，规范符号统一用 `y` / `Fy`，详见 [`doc/spec/00_读法与符号速查.md`](doc/spec/00_读法与符号速查.md)。
 * **严禁引入外部物理引擎**：本项目定位为**纯数学微分-代数方程（DAE）求解**，**严禁**引入 MuJoCo、PyBullet、Gazebo 或 Isaac Sim 等重型物理引擎。
-* **核心论文基准指标（Benchmarks）**：
-  * **整机总质量**：`0.62 kg`（翼展 `1.0 m`，机身长 `0.5 m`）
-  * **工况 A（纯腿部垂直跳跃，关闭螺旋桨）**：最大垂直跳跃高度约 **`0.26 m`**
-  * **工况 B（跳跃辅助起飞，开启螺旋桨与气动）**：离地瞬时高度约 **`0.50 m`**，前飞水平速度达到 **`2.20 m/s`**
+* **质量与论文指标**：实机称量质量、正文近似质量和各仿真工况指标分开记录。具体质量来源见 YAML；基准值、测量定义及容差只以 [`plan/milestone.md`](plan/milestone.md) 为准。
 
 ---
 
