@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 356" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <filter id="cardShadowA2" x="-4%" y="-4%" width="108%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrBlueA2" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrOrangeA2" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c"/>
+    </marker>
+    <marker id="arrGreenA2" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <!-- ======================== 左卡：RAVEN 开链腿上的 3 根有效杆臂 ======================== -->
+  <g transform="translate(16, 16)">
+    <rect width="448" height="324" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadowA2)"/>
+    <text x="18" y="30" font-size="14.5" font-weight="800" fill="#0f172a">各转动列对应的有效杆臂（铰点 → p_tip）</text>
+    <text x="18" y="48" font-size="11" fill="#64748b">仅不动铰点可作为转动中心 · J₃ 为常值折角 θ₃，无对应列</text>
+
+    <!-- 腿部连杆骨架（深灰） -->
+    <line x1="250" y1="76" x2="112" y2="136" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+    <text x="166" y="98" font-size="12" font-weight="700" fill="#334155">l₁</text>
+    <line x1="112" y1="136" x2="100" y2="246" stroke="#334155" stroke-width="4.6" stroke-linecap="round"/>
+    <text x="86" y="196" font-size="12" font-weight="700" fill="#334155">l₂</text>
+    <line x1="100" y1="246" x2="130" y2="284" stroke="#64748b" stroke-width="4.2" stroke-linecap="round"/>
+    <text x="96" y="278" font-size="11.5" font-weight="700" fill="#64748b">l₃</text>
+    <line x1="130" y1="284" x2="324" y2="284" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- 3 根分色有效杆臂 -->
+    <!-- 蓝：r₃ = r₄ (J₁ → p_tip) -->
+    <line x1="250" y1="76" x2="322" y2="278" stroke="#0284c7" stroke-width="2.6" stroke-dasharray="6,3" marker-end="url(#arrBlueA2)"/>
+    <text x="298" y="164" font-size="12.5" font-weight="800" fill="#0284c7">r₃ = r₄</text>
+    <text x="298" y="180" font-size="11" fill="#0369a1">跨 l₁∼l₄</text>
+
+    <!-- 橙：r₅ (J₂ → p_tip) -->
+    <line x1="112" y1="136" x2="318" y2="280" stroke="#ea580c" stroke-width="2.6" stroke-dasharray="6,3" marker-end="url(#arrOrangeA2)"/>
+    <text x="196" y="184" font-size="12.5" font-weight="800" fill="#ea580c">r₅</text>
+    <text x="196" y="199" font-size="11" fill="#c2410c">跨 l₂∼l₄</text>
+
+    <!-- 绿：r₆ (J₄ → p_tip) -->
+    <line x1="134" y1="284" x2="317" y2="284" stroke="#16a34a" stroke-width="3" marker-end="url(#arrGreenA2)"/>
+    <text x="226" y="306" text-anchor="middle" font-size="12" font-weight="800" fill="#15803d">r₆（仅脚趾 l₄）</text>
+
+    <!-- 铰点与爪尖 -->
+    <circle cx="250" cy="76" r="5.5" fill="#ffffff" stroke="#0284c7" stroke-width="2.6"/>
+    <text x="264" y="80" font-size="12" font-weight="800" fill="#0284c7">J₁（髋）</text>
+
+    <circle cx="112" cy="136" r="5.5" fill="#ffffff" stroke="#ea580c" stroke-width="2.6"/>
+    <text x="54" y="140" font-size="12" font-weight="800" fill="#ea580c">J₂（踝）</text>
+
+    <rect x="96" y="242" width="8" height="8" rx="1.5" fill="#64748b"/>
+    <text x="18" y="250" font-size="11" font-weight="700" fill="#64748b">J₃（θ₃常值）</text>
+
+    <circle cx="130" cy="284" r="5.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="116" y="304" font-size="12" font-weight="800" fill="#16a34a">J₄（趾）</text>
+
+    <circle cx="324" cy="284" r="5.5" fill="#16a34a"/>
+    <text x="336" y="288" font-size="12.5" font-weight="800" fill="#15803d">p_tip</text>
+  </g>
+
+  <!-- ======================== 右卡：各列权重速查 ======================== -->
+  <g transform="translate(480, 16)">
+    <rect width="484" height="324" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadowA2)"/>
+    <text x="18" y="30" font-size="14.5" font-weight="800" fill="#0f172a">6 列权重速查（颜色与左图杆臂对应）</text>
+
+    <!-- 通式条 -->
+    <rect x="16" y="42" width="452" height="30" rx="6" fill="#f1f5f9"/>
+    <text x="242" y="61" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0f172a" font-family="ui-serif, Georgia, serif">转动列通式：第 j 列 = R(90°) rⱼ = [−rⱼ,y ,  rⱼ,x]ᵀ</text>
+
+    <!-- 列 1-2 -->
+    <rect x="16" y="82" width="452" height="44" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+    <text x="30" y="101" font-size="12.5" font-weight="800" fill="#334155">列 1–2</text>
+    <text x="30" y="117" font-size="11" fill="#64748b">q₁, q₂</text>
+    <text x="108" y="108" font-size="12" font-weight="700" fill="#334155">纯平移（无铰点）· 权重直接为单位阵 I₂</text>
+
+    <!-- 列 3-4 -->
+    <rect x="16" y="134" width="452" height="44" rx="8" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.4"/>
+    <text x="30" y="153" font-size="12.5" font-weight="800" fill="#0284c7">列 3、4</text>
+    <text x="30" y="169" font-size="11" fill="#0369a1">q₃, q₄</text>
+    <text x="108" y="153" font-size="12" font-weight="700" fill="#0c4a6e">绕 J₁ · 蓝杆臂 r₃ = r₄（l₁∼l₄）逆转 90°</text>
+    <text x="108" y="169" font-size="11" fill="#0369a1">q₃ 与 q₄ 同中心、同下游，两列完全相同</text>
+
+    <!-- 列 5 -->
+    <rect x="16" y="186" width="452" height="44" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+    <text x="30" y="205" font-size="12.5" font-weight="800" fill="#ea580c">列 5</text>
+    <text x="30" y="221" font-size="11" fill="#c2410c">q₅</text>
+    <text x="108" y="212" font-size="12" font-weight="700" fill="#7c2d12">绕 J₂ · 橙杆臂 r₅（l₂∼l₄）逆转 90°</text>
+
+    <!-- 列 6 -->
+    <rect x="16" y="238" width="452" height="44" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.4"/>
+    <text x="30" y="257" font-size="12.5" font-weight="800" fill="#16a34a">列 6</text>
+    <text x="30" y="273" font-size="11" fill="#15803d">q₆</text>
+    <text x="108" y="264" font-size="12" font-weight="700" fill="#14532d">绕 J₄ · 绿杆臂 r₆（仅 l₄）逆转 90°</text>
+
+    <!-- J_toe 截断说明 -->
+    <rect x="16" y="290" width="452" height="24" rx="6" fill="#fefce8" stroke="#fde047" stroke-width="1"/>
+    <text x="242" y="306" text-anchor="middle" font-size="11" font-weight="700" fill="#854d0e">趾关节 J_toe：末端截断在 J₄（所有杆臂去掉 l₄），第 6 列恒为 0</text>
+  </g>
+</svg>
