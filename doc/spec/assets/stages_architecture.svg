@@ -1,235 +1,182 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 600" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 476" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
   <defs>
-    <!-- 柔和卡片阴影 -->
-    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.06"/>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.06"/>
     </filter>
-    <filter id="formulaShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.05"/>
-    </filter>
-
-    <!-- 顶部标题栏渐变色 -->
-    <linearGradient id="headerGrad1" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0284c7"/>
-      <stop offset="100%" stop-color="#0369a1"/>
-    </linearGradient>
-    <linearGradient id="headerGrad2" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#059669"/>
-      <stop offset="100%" stop-color="#047857"/>
-    </linearGradient>
-    <linearGradient id="headerGrad3" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f46e5"/>
-      <stop offset="100%" stop-color="#4338ca"/>
-    </linearGradient>
-    <linearGradient id="headerGrad4" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#d97706"/>
-      <stop offset="100%" stop-color="#b45309"/>
-    </linearGradient>
-    <linearGradient id="headerGrad5" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#6d28d9"/>
-    </linearGradient>
-
-    <!-- 数据流连线箭头 -->
-    <marker id="arrBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrOrange" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ea580c"/>
+    </marker>
+    <marker id="arrPurple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7"/>
     </marker>
-    <marker id="arrGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
-    </marker>
-    <marker id="arrIndigo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5"/>
-    </marker>
-    <marker id="arrAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/>
-    </marker>
-    <marker id="arrPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed"/>
+    <marker id="arrSlate" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569"/>
     </marker>
   </defs>
 
-  <!-- 顶部主标题与导语 -->
-  <text x="35" y="38" font-size="22" font-weight="700" fill="#0f172a">仿生跳跃动力学建模、控制与设计闭环全景架构</text>
-  <text x="35" y="62" font-size="13.5" fill="#64748b">围绕核心运动方程 M q̈ + C q̇ + g + J_cᵀ f_c = Sᵀ τ + f_ext 展开的 5 大阶段数学解析与数据流向</text>
+  <!-- 顶部标题 -->
+  <text x="24" y="34" font-size="19" font-weight="800" fill="#0f172a">仿生跳跃动力学建模、控制与设计闭环架构</text>
+  <text x="24" y="54" font-size="12" fill="#64748b">五阶段模块分工与核心数据流向（配色与上方三式基石方程一一对应）</text>
 
-  <!-- ======================== 卡片 1：阶段目标 1 (左上) ======================== -->
-  <g transform="translate(30, 85)">
-    <rect width="330" height="215" rx="10" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5" filter="url(#shadow)"/>
-    <path d="M 0 10 Q 0 0 10 0 L 320 0 Q 330 0 330 10 L 330 32 L 0 32 Z" fill="url(#headerGrad1)"/>
-    <text x="14" y="21" font-size="13" font-weight="700" fill="#ffffff">阶段目标 1：浮基构型与足地接触运动学</text>
-    
-    <!-- 内容要点 -->
-    <text x="14" y="52" font-size="11.5" font-weight="600" fill="#0369a1">【几何骨架与踩地约束】</text>
-    <text x="14" y="70" font-size="11" fill="#475569">• 6 自由度浮基运动链正运动学: p_c(q) ∈ ℝ²</text>
-    <text x="14" y="86" font-size="11" fill="#475569">• 双点贴地(全足) ➜ 趾尖单点滚转几何切换</text>
-    
-    <!-- 放大公式框 -->
-    <rect x="12" y="98" width="306" height="84" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.2" filter="url(#formulaShadow)"/>
-    <text x="20" y="116" font-size="11" font-weight="700" fill="#0284c7">【核心运动学与接触约束方程】(放大)</text>
-    <text x="20" y="138" font-size="13.5" font-weight="700" fill="#0369a1" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">ṗ_c = J_c(q) q̇ = 0  (速度级)</text>
-    <text x="20" y="162" font-size="13.5" font-weight="700" fill="#0284c7" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">J_c(q) q̈ + J̇_c(q,q̇) q̇ = 0  (加速度级硬约束)</text>
+  <!-- ======================== 阶段 1：浮基运动学（左上，绿） ======================== -->
+  <g transform="translate(24, 72)">
+    <rect width="316" height="176" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="316" height="34" rx="12" fill="#f0fdf4"/>
+    <rect x="0" y="22" width="316" height="12" fill="#f0fdf4"/>
+    <line x1="0" y1="34" x2="316" y2="34" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="16" y="22" font-size="13.5" font-weight="800" fill="#14532d">阶段 1 · 浮基运动学</text>
 
-    <!-- 输出流向徽章 -->
-    <rect x="180" y="188" width="138" height="20" rx="4" fill="#e0f2fe" stroke="#38bdf8"/>
-    <text x="186" y="202" font-size="10.5" font-weight="700" fill="#0284c7">输出 J_c, J̇_c ➜ 物理引擎</text>
+    <text x="16" y="54" font-size="12" fill="#475569">定义 6-DOF 广义坐标 q 与足地无滑移约束</text>
+
+    <rect x="16" y="64" width="284" height="68" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+    <text x="158" y="82" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0284c7" font-family="ui-serif, Georgia, serif">q = [x_hip, y_hip, θ_b, q_hip, q_ankle, q_toe]ᵀ ∈ ℝ⁶</text>
+    <text x="158" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d" font-family="ui-serif, Georgia, serif">J_c q̇ = 0   ·   J_c q̈ = −J̇_c q̇</text>
+    <text x="158" y="122" text-anchor="middle" font-size="11" fill="#166534">虚功接口：Q_c = J_cᵀ f_c</text>
+
+    <rect x="16" y="142" width="284" height="24" rx="6" fill="#dcfce7"/>
+    <text x="158" y="158" text-anchor="middle" font-size="11.5" font-weight="700" fill="#14532d">定义 q · 输出 p_c, J_c, J̇_c ➜ 物理引擎</text>
   </g>
 
-  <!-- ======================== 卡片 2：阶段目标 2 (左下，重点写全并放大力源) ======================== -->
-  <g transform="translate(30, 315)">
-    <rect width="330" height="260" rx="10" fill="#ffffff" stroke="#a7f3d0" stroke-width="2" filter="url(#shadow)"/>
-    <path d="M 0 10 Q 0 0 10 0 L 320 0 Q 330 0 330 10 L 330 32 L 0 32 Z" fill="url(#headerGrad2)"/>
-    <text x="14" y="21" font-size="13" font-weight="700" fill="#ffffff">阶段目标 2：执行机构与非接触外力建模</text>
-    
-    <text x="14" y="50" font-size="11.5" font-weight="600" fill="#047857">【方程等号右端：完整力源与外特性】</text>
-    <text x="14" y="67" font-size="10.5" fill="#475569">• 包含关节电机驱动力矩与全机气动/推力/扭簧外力总成</text>
-    
-    <!-- 放大公式框：写全完整力源表达式 -->
-    <rect x="12" y="75" width="306" height="150" rx="6" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5" filter="url(#formulaShadow)"/>
-    <text x="20" y="93" font-size="11" font-weight="700" fill="#065f46">【完整力源外特性合成体系】(重点写全并放大)</text>
-    
-    <!-- 1. 广义力源合力公式 -->
-    <text x="20" y="115" font-size="14.5" font-weight="800" fill="#047857" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">F_right = Sᵀ τ + f_ext ∈ ℝ⁶</text>
-    
-    <!-- 2. 非接触外力详细构成 -->
-    <text x="20" y="138" font-size="13" font-weight="700" fill="#065f46" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">f_ext = f_p + f_w + f_t + τ_a(q₅) + τ_t(q₆)</text>
-    <text x="24" y="154" font-size="10" fill="#047857">（推力 + 机翼/尾翼气动力 + 踝储能扭簧 + 趾复位弹簧）</text>
-    
-    <!-- 3. 电机力矩包络限幅公式 -->
-    <text x="20" y="176" font-size="12.5" font-weight="700" fill="#065f46" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">|τ_j| ≤ τ_max · max(0, 1 − |q̇_j| / ω_max)</text>
-    
-    <!-- 4. 驱动选择矩阵 -->
-    <text x="20" y="198" font-size="11.5" font-weight="700" fill="#047857">S = [ 0 0 0 1 0 0 ; 0 0 0 0 1 0 ] (映射到 q₄, q₅)</text>
-    <text x="20" y="215" font-size="10.5" fill="#059669">扭簧势能保守性: τ_a = −∂V_a/∂q₅, τ_t = −∂V_t/∂q₆</text>
+  <!-- ======================== 阶段 2：执行机构与外力（左下，橙） ======================== -->
+  <g transform="translate(24, 272)">
+    <rect width="316" height="176" rx="12" fill="#ffffff" stroke="#fdba74" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="316" height="34" rx="12" fill="#fff7ed"/>
+    <rect x="0" y="22" width="316" height="12" fill="#fff7ed"/>
+    <line x1="0" y1="34" x2="316" y2="34" stroke="#fed7aa" stroke-width="1"/>
+    <text x="16" y="22" font-size="13.5" font-weight="800" fill="#7c2d12">阶段 2 · 执行机构与非接触外力</text>
 
-    <!-- 输出流向徽章 -->
-    <rect x="165" y="230" width="153" height="20" rx="4" fill="#d1fae5" stroke="#10b981"/>
-    <text x="171" y="244" font-size="10.5" font-weight="700" fill="#047857">输出完整力源 (Sᵀτ + f_ext) ➜</text>
+    <text x="16" y="58" font-size="12" fill="#475569">主方程右端力源：电机包络 + 扭簧 / 气动 / 推力</text>
+
+    <rect x="16" y="72" width="284" height="54" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.2"/>
+    <text x="158" y="95" text-anchor="middle" font-size="14" font-weight="700" fill="#c2410c" font-family="ui-serif, Georgia, serif">F_right = Sᵀ τ + f_ext</text>
+    <text x="158" y="116" text-anchor="middle" font-size="11" fill="#9a3412">|τ_j| ≤ τ_max · max(0, 1 − |q̇_j|/ω_max)</text>
+
+    <rect x="16" y="138" width="284" height="24" rx="6" fill="#ffedd5"/>
+    <text x="158" y="154" text-anchor="middle" font-size="11.5" font-weight="700" fill="#7c2d12">输出 S, τ_max(q̇), f_ext ➜ 物理引擎</text>
   </g>
 
-  <!-- ======================== 卡片 3：阶段目标 3 (中枢物理引擎) ======================== -->
-  <g transform="translate(385, 85)">
-    <rect width="360" height="490" rx="10" fill="#ffffff" stroke="#818cf8" stroke-width="2.2" filter="url(#shadow)"/>
-    <path d="M 0 10 Q 0 0 10 0 L 350 0 Q 360 0 360 10 L 360 34 L 0 34 Z" fill="url(#headerGrad3)"/>
-    <text x="14" y="22" font-size="14" font-weight="700" fill="#ffffff">阶段目标 3：多刚体惯性与重力及接触约束建模</text>
-    
-    <text x="14" y="54" font-size="12" font-weight="600" fill="#4338ca">【方程等号左端：核心物理仿真引擎】</text>
-    <text x="14" y="73" font-size="11" fill="#475569">• 5 刚体质量分布、质心几何偏置与转动惯量矩阵 M(q)</text>
-    <text x="14" y="90" font-size="11" fill="#475569">• 离心力/科氏力效应矩阵 C(q, q̇) 与重力广义力项 g(q)</text>
-    <text x="14" y="107" font-size="11" fill="#475569">• 触地期微分—代数方程（DAE）联立硬接触约束</text>
-    <text x="14" y="124" font-size="11" fill="#475569">• 离地腾空 ODE 自由演化 + 碰撞冲量动量瞬态重置</text>
-    
-    <!-- 放大公式框 1：受约束多体动力学主方程 -->
-    <rect x="14" y="136" width="332" height="66" rx="6" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.2" filter="url(#formulaShadow)"/>
-    <text x="22" y="154" font-size="11" font-weight="700" fill="#4338ca">【受约束跳跃动力学主方程 (式 10)】(放大)</text>
-    <text x="22" y="178" font-size="14" font-weight="800" fill="#312e81" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">M(q) q̈ + C(q,q̇) q̇ + g(q) + J_cᵀ f_c = Sᵀ τ + f_ext</text>
-    <text x="22" y="194" font-size="10" fill="#4338ca">左端惯性/重力/杠杆臂映射接触力与阻抗力矩 = 右端阶段2完整力源输入</text>
+  <!-- ======================== 阶段 3：多体动力学与 KKT（中枢，紫） ======================== -->
+  <g transform="translate(392, 72)">
+    <rect width="336" height="376" rx="12" fill="#ffffff" stroke="#c4b5fd" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="336" height="36" rx="12" fill="#f5f3ff"/>
+    <rect x="0" y="24" width="336" height="12" fill="#f5f3ff"/>
+    <line x1="0" y1="36" x2="336" y2="36" stroke="#ddd6fe" stroke-width="1"/>
+    <text x="16" y="23" font-size="14" font-weight="800" fill="#4c1d95">阶段 3 · 多体动力学与 KKT 引擎</text>
 
-    <!-- 放大公式框 2：对称 KKT 鞍点求解体系 (超大高亮) -->
-    <rect x="14" y="210" width="332" height="152" rx="6" fill="#f5f3ff" stroke="#818cf8" stroke-width="1.5" filter="url(#formulaShadow)"/>
-    <text x="22" y="228" font-size="11" font-weight="700" fill="#4c1d95">【触地阶段对称 KKT 鞍点求解矩阵】(放大高亮)</text>
-    
-    <g transform="translate(22, 238)">
-      <!-- KKT 矩阵大括号与排版 -->
-      <text x="0" y="24" font-size="28" fill="#4338ca" font-weight="300">[</text>
-      <text x="12" y="18" font-size="14.5" font-weight="700" fill="#3730a3" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">M(q)</text>
-      <text x="75" y="18" font-size="14.5" font-weight="700" fill="#4338ca" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">J_cᵀ(q)</text>
-      <text x="12" y="44" font-size="14.5" font-weight="700" fill="#4338ca" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">J_c(q)</text>
-      <text x="85" y="44" font-size="14.5" font-weight="700" fill="#6b7280" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">0</text>
-      <text x="126" y="24" font-size="28" fill="#4338ca" font-weight="300">]</text>
+    <text x="16" y="60" font-size="12" fill="#475569">组装惯性/重力矩阵与模态 σ，正向同步求解</text>
 
-      <!-- 待求未知量向量 -->
-      <text x="135" y="24" font-size="28" fill="#4338ca" font-weight="300">[</text>
-      <text x="144" y="18" font-size="15" font-weight="800" fill="#b91c1c" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">q̈</text>
-      <text x="144" y="44" font-size="15" font-weight="800" fill="#b91c1c" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">f_c</text>
-      <text x="165" y="24" font-size="28" fill="#4338ca" font-weight="300">]</text>
+    <!-- 主方程框 -->
+    <rect x="16" y="74" width="304" height="58" rx="8" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.2"/>
+    <text x="168" y="94" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">受约束动力学主方程（式 10）</text>
+    <text x="168" y="118" text-anchor="middle" font-size="13.5" font-weight="800" fill="#4c1d95" font-family="ui-serif, Georgia, serif">M q̈ + C q̇ + g + J_cᵀ f_c = Sᵀ τ + f_ext</text>
 
-      <text x="175" y="32" font-size="16" font-weight="700" fill="#3730a3">=</text>
+    <!-- KKT 鞍点框 -->
+    <rect x="16" y="146" width="304" height="120" rx="8" fill="#faf5ff" stroke="#c4b5fd" stroke-width="1.4"/>
+    <text x="168" y="166" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">触地相 KKT 鞍点方程</text>
 
-      <!-- 右端项向量 -->
-      <text x="190" y="24" font-size="28" fill="#4338ca" font-weight="300">[</text>
-      <text x="200" y="18" font-size="13" font-weight="700" fill="#047857" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">Sᵀτ + f_ext − C q̇ − g</text>
-      <text x="200" y="44" font-size="13" font-weight="700" fill="#0284c7" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">− J̇_c(q,q̇) q̇</text>
-      <text x="300" y="24" font-size="28" fill="#4338ca" font-weight="300">]</text>
+    <!-- 左矩阵 [M J_c^T; J_c 0] -->
+    <path d="M 38 180 L 28 180 L 28 242 L 38 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 106 180 L 116 180 L 116 242 L 106 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="700" text-anchor="middle">
+      <text x="52" y="204" fill="#4c1d95">M</text>
+      <text x="90" y="204" fill="#16a34a">J_cᵀ</text>
+      <text x="52" y="232" fill="#16a34a">J_c</text>
+      <text x="90" y="232" fill="#94a3b8">0</text>
     </g>
-    
-    <text x="22" y="318" font-size="11" font-weight="600" fill="#3730a3">同步直接求解: 全身加速度 q̈  与 地面反力 f_c = [Fx, Fy]ᵀ</text>
-    <text x="22" y="336" font-size="10.5" fill="#475569">接触有效性判据: 法向受压 Fy ≥ 0 且静摩擦锥 |Fx| ≤ μ Fy</text>
-    <text x="22" y="352" font-size="10.5" fill="#475569">离地判据: Fy 减小至 0 即触发离地事件，系统切换为无约束 ODE</text>
 
-    <!-- 腾空方程框 -->
-    <rect x="14" y="370" width="332" height="48" rx="6" fill="#ffffff" stroke="#c7d2fe"/>
-    <text x="22" y="388" font-size="10.5" font-weight="700" fill="#4338ca">【腾空飞行阶段无约束动力学 (式 23)】</text>
-    <text x="22" y="407" font-size="13" font-weight="700" fill="#3730a3" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">M(q) q̈ + C(q,q̇) q̇ + g(q) = Sᵀ τ + f_ext  ➜  q̈ = M⁻¹(·)</text>
+    <!-- 未知向量 [q̈; f_c] -->
+    <path d="M 134 180 L 124 180 L 124 242 L 134 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 156 180 L 166 180 L 166 242 L 156 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="14" font-weight="800" text-anchor="middle" fill="#b91c1c">
+      <text x="145" y="204">q̈</text>
+      <text x="145" y="232">f_c</text>
+    </g>
 
-    <!-- 底部功能标签 -->
-    <rect x="14" y="426" width="332" height="52" rx="6" fill="#e0e7ff" stroke="#a5b4fc"/>
-    <text x="22" y="444" font-size="11" font-weight="700" fill="#3730a3">多体引擎中枢职能：</text>
-    <text x="22" y="460" font-size="10.5" fill="#4338ca">① 为阶段4提供质量惯量矩阵 M, C, g 供力矩逆解</text>
-    <text x="22" y="473" font-size="10.5" fill="#4338ca">② 接收阶段4力矩输入，正向计算瞬时加速度推进仿真</text>
+    <text x="180" y="217" text-anchor="middle" font-size="16" font-weight="700" fill="#4c1d95">=</text>
+
+    <!-- 右端向量 -->
+    <path d="M 202 180 L 192 180 L 192 242 L 202 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 298 180 L 308 180 L 308 242 L 298 242" fill="none" stroke="#4c1d95" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="12" font-weight="700" text-anchor="middle">
+      <text x="250" y="204" fill="#c2410c">Sᵀτ+f_ext−Cq̇−g</text>
+      <text x="250" y="232" fill="#16a34a">−J̇_c q̇</text>
+    </g>
+
+    <text x="168" y="258" text-anchor="middle" font-size="10.5" fill="#64748b">法向受压 Fy ≥ 0 · 静摩擦锥校验 · Fy=0 离地</text>
+
+    <!-- 腾空相框 -->
+    <rect x="16" y="280" width="304" height="46" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="168" y="298" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">腾空相无约束 ODE（f_c = 0，式 23）</text>
+    <text x="168" y="317" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155" font-family="ui-serif, Georgia, serif">q̈ = M⁻¹(Sᵀ τ + f_ext − C q̇ − g)</text>
+
+    <rect x="16" y="338" width="304" height="24" rx="6" fill="#ede9fe"/>
+    <text x="168" y="354" text-anchor="middle" font-size="11.5" font-weight="700" fill="#4c1d95">输出 M, C, g ➜ 控制 · (q̈, f_c) ➜ 积分</text>
   </g>
 
-  <!-- ======================== 卡片 4：阶段目标 4 (右上) ======================== -->
-  <g transform="translate(768, 85)">
-    <rect width="342" height="215" rx="10" fill="#ffffff" stroke="#fde68a" stroke-width="1.5" filter="url(#shadow)"/>
-    <path d="M 0 10 Q 0 0 10 0 L 332 0 Q 342 0 342 10 L 342 32 L 0 32 Z" fill="url(#headerGrad4)"/>
-    <text x="14" y="21" font-size="13" font-weight="700" fill="#ffffff">阶段目标 4：多任务控制与力矩逆解</text>
-    
-    <text x="14" y="52" font-size="11.5" font-weight="600" fill="#b45309">【运动大脑：逆解电机力矩】</text>
-    <text x="14" y="70" font-size="11" fill="#475569">• 控制目标：离地合速度 2.5 m/s、抬头角速度 q̇₃ ≈ 0</text>
-    <text x="14" y="86" font-size="11" fill="#475569">• 3 级任务优先级：机身俯仰(P1) ➜ 水平(P2) ➜ 竖直(P3)</text>
-    
-    <!-- 放大公式框 -->
-    <rect x="12" y="98" width="318" height="84" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.2" filter="url(#formulaShadow)"/>
-    <text x="20" y="116" font-size="11" font-weight="700" fill="#b45309">【零空间投影与去约束力矩反解】(放大)</text>
-    <text x="20" y="137" font-size="13" font-weight="700" fill="#92400e" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">q̈_d = q̈₁ + N₁(q̈₂ + N₂ q̈₃)  (零空间无冲突叠加)</text>
-    <text x="20" y="161" font-size="13" font-weight="700" fill="#b45309" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">τ = (S_u Q₂)⁻¹ Q₂ᵀ (M q̈_d + C q̇ + g − f_ext)</text>
-    <text x="20" y="176" font-size="9.5" fill="#78350f">（通过 QR 分解正交投影 Q₂ 消除未知地面反力 fc 逆解 τ）</text>
+  <!-- ======================== 阶段 4：多任务控制逆解（右上，蓝） ======================== -->
+  <g transform="translate(780, 72)">
+    <rect width="316" height="176" rx="12" fill="#ffffff" stroke="#7dd3fc" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="316" height="34" rx="12" fill="#f0f9ff"/>
+    <rect x="0" y="22" width="316" height="12" fill="#f0f9ff"/>
+    <line x1="0" y1="34" x2="316" y2="34" stroke="#bae6fd" stroke-width="1"/>
+    <text x="16" y="22" font-size="13.5" font-weight="800" fill="#0c4a6e">阶段 4 · 多任务控制逆解</text>
 
-    <!-- 输出流向徽章 -->
-    <rect x="180" y="188" width="150" height="20" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
-    <text x="186" y="202" font-size="10.5" font-weight="700" fill="#b45309">输出电机指令 τ ➜ 闭环仿真</text>
+    <text x="16" y="58" font-size="12" fill="#475569">3 级零空间优先级投影 + QR 消反力反解</text>
+
+    <rect x="16" y="72" width="284" height="54" rx="8" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+    <text x="158" y="94" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0369a1" font-family="ui-serif, Georgia, serif">q̈_d = q̈₁ + N₁(q̈₂ + N₂ q̈₃)</text>
+    <text x="158" y="116" text-anchor="middle" font-size="12" font-weight="700" fill="#0284c7" font-family="ui-serif, Georgia, serif">τ = (S_u Q₂)⁻¹ Q₂ᵀ (M q̈_d + C q̇ + g − f_ext)</text>
+
+    <rect x="16" y="138" width="284" height="24" rx="6" fill="#e0f2fe"/>
+    <text x="158" y="154" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0c4a6e">输出期望关节力矩 τ ➜ 引擎 / 仿真</text>
   </g>
 
-  <!-- ======================== 卡片 5：阶段目标 5 (右下) ======================== -->
-  <g transform="translate(768, 315)">
-    <rect width="342" height="260" rx="10" fill="#ffffff" stroke="#ddd6fe" stroke-width="1.5" filter="url(#shadow)"/>
-    <path d="M 0 10 Q 0 0 10 0 L 332 0 Q 342 0 342 10 L 342 32 L 0 32 Z" fill="url(#headerGrad5)"/>
-    <text x="14" y="21" font-size="13" font-weight="700" fill="#ffffff">阶段目标 5：闭环仿真与硬件设计验证</text>
-    
-    <text x="14" y="50" font-size="11.5" font-weight="600" fill="#6d28d9">【数值积分、减速比反解与真机落地】</text>
-    <text x="14" y="68" font-size="11" fill="#475569">• 自适应 ODE 积分求解器 + Baumgarte 约束漂移抑制</text>
-    <text x="14" y="85" font-size="11" fill="#475569">• 触地全足 ➜ 绕尖 ➜ 离地腾空全流程时序闭环积分</text>
-    
-    <!-- 放大公式框：减速比反解与离散阶梯指令 -->
-    <rect x="12" y="96" width="318" height="128" rx="6" fill="#faf5ff" stroke="#a855f7" stroke-width="1.2" filter="url(#formulaShadow)"/>
-    <text x="20" y="114" font-size="11" font-weight="700" fill="#6d28d9">【传动减速比反解与离散指令提取】(放大)</text>
-    
-    <text x="20" y="137" font-size="13.5" font-weight="800" fill="#581c87" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">i_gear ≤ ω_motor,max / q̇_joint,max ≈ 22.8</text>
-    <text x="20" y="156" font-size="11.5" font-weight="600" fill="#6d28d9">起跳末期极限角速度高达 4384°/s ➜ 选定 19.13</text>
-    
-    <!-- 离散阶梯指令提取 -->
-    <text x="20" y="180" font-size="12.5" font-weight="700" fill="#581c87" font-family="'Cambria Math','STIX Two Math','DejaVu Serif',Georgia,serif">q̇_cmd(t) ➜ Discrete Step Functions</text>
-    <text x="20" y="196" font-size="10" fill="#6d28d9">将仿真连续最优速度曲线离散化为阶梯速度脉冲</text>
-    <text x="20" y="210" font-size="10" fill="#4c1d95">烧录进 STM32 单片机通过 CAN 总线直驱物理样机</text>
+  <!-- ======================== 阶段 5：闭环仿真与硬件反解（右下，灰） ======================== -->
+  <g transform="translate(780, 272)">
+    <rect width="316" height="176" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="316" height="34" rx="12" fill="#f1f5f9"/>
+    <rect x="0" y="22" width="316" height="12" fill="#f1f5f9"/>
+    <line x1="0" y1="34" x2="316" y2="34" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="16" y="22" font-size="13.5" font-weight="800" fill="#0f172a">阶段 5 · 闭环仿真与硬件反解</text>
 
-    <!-- 落地徽章 -->
-    <rect x="180" y="230" width="150" height="20" rx="4" fill="#ede9fe" stroke="#8b5cf6"/>
-    <text x="186" y="244" font-size="10.5" font-weight="700" fill="#6d28d9">实现 Sim-to-Real 参数闭环 ★</text>
+    <text x="16" y="58" font-size="12" fill="#475569">ODE 连续积分推进 · 反解减速比与实机轨迹</text>
+
+    <rect x="16" y="72" width="284" height="54" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+    <text x="158" y="95" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b" font-family="ui-serif, Georgia, serif">i_gear ≤ ω_max / q̇_max ≈ 22.8 → 19.13</text>
+    <text x="158" y="116" text-anchor="middle" font-size="11" fill="#475569">离散阶梯速度指令 q̇_cmd(t) → Sim-to-Real</text>
+
+    <rect x="16" y="138" width="284" height="24" rx="6" fill="#e2e8f0"/>
+    <text x="158" y="154" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">反馈状态 (q, q̇) · 硬件参数闭环</text>
   </g>
 
-  <!-- ======================== 数据流流动连线 ======================== -->
+  <!-- ======================== 模块间连线 ======================== -->
   <!-- 阶段 1 ➜ 阶段 3 -->
-  <path d="M 360 170 L 385 170" fill="none" stroke="#0284c7" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+  <line x1="340" y1="160" x2="386" y2="160" stroke="#16a34a" stroke-width="2.4" marker-end="url(#arrGreen)"/>
+  <text x="366" y="150" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">q, J_c</text>
 
-  <!-- 阶段 2 ➜ 阶段 3 (粗绿色力源注入) -->
-  <path d="M 360 410 L 385 410" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#arrGreen)"/>
+  <!-- 阶段 2 ➜ 阶段 3 -->
+  <line x1="340" y1="360" x2="386" y2="360" stroke="#ea580c" stroke-width="2.4" marker-end="url(#arrOrange)"/>
+  <text x="366" y="350" text-anchor="middle" font-size="10.5" font-weight="700" fill="#c2410c">S, f_ext</text>
 
-  <!-- 阶段 3 ➜ 阶段 4 (输出 M, C, g 矩阵给大脑) -->
-  <path d="M 745 170 L 768 170" fill="none" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrIndigo)"/>
+  <!-- 阶段 3 ➜ 阶段 4 (M, C, g) -->
+  <line x1="728" y1="138" x2="774" y2="138" stroke="#7c3aed" stroke-width="2.2" marker-end="url(#arrPurple)"/>
+  <text x="754" y="128" text-anchor="middle" font-size="10" font-weight="700" fill="#6d28d9">M,C,g</text>
 
-  <!-- 阶段 4 ➜ 阶段 5 (输出指令力矩进闭环仿真) -->
-  <path d="M 940 300 L 940 315" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrAmber)"/>
+  <!-- 阶段 4 ➜ 阶段 3 (τ) -->
+  <line x1="780" y1="184" x2="734" y2="184" stroke="#0284c7" stroke-width="2.2" marker-end="url(#arrBlue)"/>
+  <text x="754" y="176" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0369a1">τ</text>
 
-  <!-- 阶段 5 ➜ 阶段 3 (闭环步进迭代反馈虚线) -->
-  <path d="M 768 460 L 745 460" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrPurple)"/>
+  <!-- 阶段 3 ➜ 阶段 5 (q̈) -->
+  <line x1="728" y1="336" x2="774" y2="336" stroke="#7c3aed" stroke-width="2.2" marker-end="url(#arrPurple)"/>
+  <text x="754" y="326" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">q̈</text>
+
+  <!-- 阶段 5 ➜ 阶段 3 ((q, q̇) 步进反馈) -->
+  <line x1="780" y1="382" x2="734" y2="382" stroke="#475569" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrSlate)"/>
+  <text x="754" y="373" text-anchor="middle" font-size="10" font-weight="700" fill="#475569">(q, q̇)</text>
 </svg>

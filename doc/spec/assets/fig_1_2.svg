@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1726" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <filter id="cardShadow12" x="-4%" y="-4%" width="108%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- ======================== 卡片 1：绝对倾角 ======================== -->
+  <rect x="16" y="16" width="948" height="348" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow12)"/>
+  <text x="36" y="48" font-size="18" font-weight="800" fill="#334155">绝对倾角（中间量）</text>
+  <text x="36" y="70" font-size="12" fill="#64748b">四段杆相对世界 +X · θ₃ 为常值，不进入 q · 右列把局部杆转到世界系</text>
+
+  <!-- α -->
+  <text x="40" y="214" font-size="36" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#334155">α</text>
+  <text x="72" y="214" font-size="28" fill="#334155">=</text>
+  <path d="M 128 108 L 112 108 L 112 324 L 128 324" fill="none" stroke="#334155" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 180 108 L 196 108 L 196 324 L 180 324" fill="none" stroke="#334155" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="22" font-weight="700" fill="#334155">
+    <text x="138" y="146">α₁</text>
+    <text x="138" y="202">α₂</text>
+    <text x="138" y="258">α₃</text>
+    <text x="138" y="314">α₄</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700">
+    <text x="216" y="136"><tspan fill="#0284c7">q₃</tspan><tspan fill="#334155"> + </tspan><tspan fill="#ea580c">q₄</tspan></text>
+    <text x="216" y="192"><tspan fill="#334155">α₁ + </tspan><tspan fill="#ea580c">q₅</tspan></text>
+    <text x="216" y="248"><tspan fill="#334155">α₂ + </tspan><tspan fill="#64748b">θ₃</tspan></text>
+    <text x="216" y="304"><tspan fill="#334155">α₃ + </tspan><tspan fill="#ea580c">q₆</tspan></text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="216" y="154">大腿，相对 +X</text>
+    <text x="216" y="210">小腿</text>
+    <text x="216" y="266">足掌 · θ₃ 常值，不进 q</text>
+    <text x="216" y="322">脚趾</text>
+  </g>
+
+  <!-- 旋转矩阵 -->
+  <text x="470" y="112" font-size="14" font-weight="800" fill="#334155">转到世界系</text>
+  <text x="470" y="130" font-size="12" fill="#64748b">式 (8) · 局部 +x 沿杆</text>
+  <text x="470" y="178" font-size="18" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#334155">R(αᵢ)</text>
+  <text x="545" y="178" font-size="20" fill="#334155">=</text>
+  <path d="M 590 148 L 574 148 L 574 214 L 590 214" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 860 148 L 876 148 L 876 214 L 860 214" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700" fill="#334155" text-anchor="middle">
+    <text x="680" y="174">cos αᵢ</text>
+    <text x="790" y="174">−sin αᵢ</text>
+    <text x="680" y="206">sin αᵢ</text>
+    <text x="790" y="206">cos αᵢ</text>
+  </g>
+  <text x="564" y="250" text-anchor="middle" font-size="11" fill="#64748b">局部系杆矢</text>
+  <text x="702" y="250" text-anchor="middle" font-size="11" fill="#64748b">世界系杆矢</text>
+  <text x="470" y="301" font-size="18" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#334155">R(αᵢ)</text>
+  <path d="M 546 260 L 534 260 L 534 330 L 546 330" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 582 260 L 594 260 L 594 330 L 582 330" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="564" y="286" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="16" font-weight="700" fill="#334155">lᵢ</text>
+  <text x="564" y="318" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#334155">0</text>
+  <text x="616" y="301" text-anchor="middle" font-size="20" fill="#334155">=</text>
+  <path d="M 652 260 L 638 260 L 638 330 L 652 330" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 752 260 L 766 260 L 766 330 L 752 330" fill="none" stroke="#334155" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700" fill="#334155" text-anchor="middle">
+    <text x="702" y="286">lᵢ cos αᵢ</text>
+    <text x="702" y="318">lᵢ sin αᵢ</text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="782" y="286">世界 +X</text>
+    <text x="782" y="318">世界 +Y</text>
+  </g>
+
+  <!-- ======================== 卡片 2：足端位置 ======================== -->
+  <rect x="16" y="380" width="948" height="400" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#cardShadow12)"/>
+  <text x="36" y="412" font-size="18" font-weight="800" fill="#14532d">足端位置</text>
+  <text x="36" y="434" font-size="12" fill="#166534">p_tip ≡ p_claw · 代码 tip = 论文 claw</text>
+
+  <!-- p_toe -->
+  <text x="40" y="530" font-size="34" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">p</text>
+  <text x="62" y="544" font-size="15" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">toe</text>
+  <text x="108" y="530" font-size="28" fill="#14532d">=</text>
+  <path d="M 164 478 L 148 478 L 148 582 L 164 582" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 214 478 L 230 478 L 230 582 L 214 582" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="24" font-style="italic" font-weight="700" fill="#16a34a">
+    <text x="176" y="516">x</text>
+    <text x="176" y="564">y</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700">
+    <text x="252" y="508"><tspan fill="#0284c7">q₁</tspan><tspan fill="#14532d"> + l₁ cos α₁ + l₂ cos α₂ + l₃ cos α₃</tspan></text>
+    <text x="252" y="556"><tspan fill="#0284c7">q₂</tspan><tspan fill="#14532d"> + l₁ sin α₁ + l₂ sin α₂ + l₃ sin α₃</tspan></text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="252" y="528">向前 · 髋的 +X，加上大腿、小腿、足掌</text>
+    <text x="252" y="576">向上 · 髋的 +Y，加上这三段 · 停在 J₄</text>
+  </g>
+
+  <!-- p_tip -->
+  <text x="40" y="688" font-size="34" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">p</text>
+  <text x="62" y="702" font-size="15" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">tip</text>
+  <text x="100" y="688" font-size="28" fill="#14532d">=</text>
+  <path d="M 164 636 L 148 636 L 148 740 L 164 740" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 214 636 L 230 636 L 230 740 L 214 740" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="24" font-style="italic" font-weight="700" fill="#16a34a">
+    <text x="176" y="674">x</text>
+    <text x="176" y="722">y</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700">
+    <text x="252" y="666"><tspan fill="#0284c7">q₁</tspan><tspan fill="#14532d"> + l₁ cos α₁ + l₂ cos α₂ + l₃ cos α₃ + l₄ cos α₄</tspan></text>
+    <text x="252" y="714"><tspan fill="#0284c7">q₂</tspan><tspan fill="#14532d"> + l₁ sin α₁ + l₂ sin α₂ + l₃ sin α₃ + l₄ sin α₄</tspan></text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="252" y="686">向前 · 比 p_toe 多一段脚趾 l₄</text>
+    <text x="252" y="734">向上 · 求和到 i = 4，停在爪尖</text>
+  </g>
+
+  <!-- ======================== 卡片 3：雅可比 ======================== -->
+  <rect x="16" y="796" width="948" height="400" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#cardShadow12)"/>
+  <text x="36" y="828" font-size="18" font-weight="800" fill="#14532d">足端雅可比 J_tip</text>
+  <text x="36" y="850" font-size="12" fill="#166534">作用：将 6 维广义速度 q̇ 映射为 2 维足端世界系线速度 ṗ（ṗ = J q̇）· 各行算出对应方向速度，各列是对应 q̇ⱼ 的贡献系数</text>
+
+  <!-- 列分组 -->
+  <path d="M 245 918 L 245 906 L 455 906 L 455 918" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="350" y="886" text-anchor="middle" font-size="12" font-weight="800" fill="#0284c7">× q̇₁, q̇₂（平动）</text>
+  <text x="350" y="900" text-anchor="middle" font-size="11" fill="#64748b">单位阵</text>
+
+  <path d="M 485 918 L 485 906 L 695 906 L 695 918" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="590" y="886" text-anchor="middle" font-size="12" font-weight="800" fill="#334155">× q̇₃, q̇₄（俯仰与髋）</text>
+  <text x="590" y="900" text-anchor="middle" font-size="11" fill="#64748b">l₁∼l₄ · 两列相同</text>
+
+  <path d="M 725 918 L 725 906 L 815 906 L 815 918" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="770" y="886" text-anchor="middle" font-size="12" font-weight="800" fill="#ea580c">× q̇₅（踝）</text>
+  <text x="770" y="900" text-anchor="middle" font-size="11" fill="#64748b">l₂∼l₄</text>
+
+  <path d="M 845 918 L 845 906 L 935 906 L 935 918" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="890" y="886" text-anchor="middle" font-size="12" font-weight="800" fill="#ea580c">× q̇₆（趾）</text>
+  <text x="890" y="900" text-anchor="middle" font-size="11" fill="#64748b">仅 l₄</text>
+
+  <!-- 矩阵括号 -->
+  <path d="M 236 948 L 216 948 L 216 1088 L 236 1088" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 934 948 L 954 948 L 954 1088 L 934 1088" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 行注释 -->
+  <text x="36" y="1004" font-size="12" fill="#64748b">算出</text>
+  <text x="66" y="1004" font-size="22" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">ẋ</text>
+  <text x="92" y="1004" font-size="12" fill="#64748b">爪尖水平线速度</text>
+  <text x="36" y="1064" font-size="12" fill="#64748b">算出</text>
+  <text x="66" y="1064" font-size="22" font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">ẏ</text>
+  <text x="92" y="1064" font-size="12" fill="#64748b">爪尖竖直线速度</text>
+
+  <!-- 矩阵元 -->
+  <g font-size="20" font-weight="700" text-anchor="middle">
+    <text x="290" y="1008" fill="#0f172a" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">1</text>
+    <text x="410" y="1008" fill="#0f172a" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">0</text>
+    <text x="530" y="1008" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₁₃</text>
+    <text x="650" y="1008" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₁₄</text>
+    <text x="770" y="1008" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₁₅</text>
+    <text x="890" y="1008" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₁₆</text>
+    <text x="290" y="1068" fill="#0f172a" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">0</text>
+    <text x="410" y="1068" fill="#0f172a" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">1</text>
+    <text x="530" y="1068" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₂₃</text>
+    <text x="650" y="1068" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₂₄</text>
+    <text x="770" y="1068" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₂₅</text>
+    <text x="890" y="1068" fill="#16a34a" font-family="ui-serif, Georgia, serif">J₂₆</text>
+  </g>
+
+  <text x="36" y="1136" font-size="13" fill="#334155">
+    <tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">J</tspan><tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a" font-size="11">toe</tspan><tspan>：同一张表去掉 l₄，第 6 列为 0</tspan>
+  </text>
+  <text x="36" y="1162" font-size="13" fill="#334155">
+    <tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">J̇</tspan><tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a" font-size="11">tip</tspan><tspan> 与 </tspan><tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a">J̇</tspan><tspan font-family="ui-serif, Georgia, serif" font-style="italic" font-weight="700" fill="#16a34a" font-size="11">toe</tspan><tspan>：同形，格内各元改为对时间的导数</tspan>
+  </text>
+
+  <!-- ======================== 卡片 4：雅可比各元 ======================== -->
+  <rect x="16" y="1212" width="948" height="498" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#cardShadow12)"/>
+  <text x="36" y="1244" font-size="18" font-weight="800" fill="#14532d">雅可比各元</text>
+  <text x="36" y="1266" font-size="12" fill="#166534">第 1、2 列是单位阵，已写在上一卡 · 括号外是该元的闭式</text>
+
+  <!-- 第 3、4 列 -->
+  <text x="36" y="1366" font-size="13" font-weight="800" fill="#334155">俯仰与髋</text>
+  <text x="36" y="1384" font-size="12" fill="#64748b">第 3、4 列</text>
+  <path d="M 176 1310 L 160 1310 L 160 1414 L 176 1414" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 248 1310 L 264 1310 L 264 1414 L 248 1414" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="20" font-weight="700" fill="#16a34a">
+    <text x="184" y="1354">J₁₃</text>
+    <text x="184" y="1402">J₂₃</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700" fill="#14532d">
+    <text x="284" y="1346">−(l₁ sin α₁ + l₂ sin α₂ + l₃ sin α₃ + l₄ sin α₄)</text>
+    <text x="284" y="1394">l₁ cos α₁ + l₂ cos α₂ + l₃ cos α₃ + l₄ cos α₄</text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="284" y="1366">水平 · 整条腿 · 第 4 列与此相同</text>
+    <text x="284" y="1414">竖直 · 整条腿 · 第 4 列与此相同</text>
+  </g>
+
+  <!-- 第 5 列 -->
+  <text x="36" y="1494" font-size="13" font-weight="800" fill="#ea580c">踝</text>
+  <text x="36" y="1512" font-size="12" fill="#64748b">第 5 列</text>
+  <path d="M 176 1438 L 160 1438 L 160 1542 L 176 1542" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 248 1438 L 264 1438 L 264 1542 L 248 1542" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="20" font-weight="700" fill="#16a34a">
+    <text x="184" y="1482">J₁₅</text>
+    <text x="184" y="1530">J₂₅</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700" fill="#14532d">
+    <text x="284" y="1474">−(l₂ sin α₂ + l₃ sin α₃ + l₄ sin α₄)</text>
+    <text x="284" y="1522">l₂ cos α₂ + l₃ cos α₃ + l₄ cos α₄</text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="284" y="1494">水平 · 自 J₂ 起，不含大腿</text>
+    <text x="284" y="1542">竖直 · 自 J₂ 起，不含大腿</text>
+  </g>
+
+  <!-- 第 6 列 -->
+  <text x="36" y="1622" font-size="13" font-weight="800" fill="#ea580c">趾</text>
+  <text x="36" y="1640" font-size="12" fill="#64748b">第 6 列</text>
+  <path d="M 176 1566 L 160 1566 L 160 1670 L 176 1670" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 248 1566 L 264 1566 L 264 1670 L 248 1670" fill="none" stroke="#14532d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="ui-serif, Georgia, serif" font-size="20" font-weight="700" fill="#16a34a">
+    <text x="184" y="1610">J₁₆</text>
+    <text x="184" y="1658">J₂₆</text>
+  </g>
+  <g font-family="ui-serif, Georgia, serif" font-size="15" font-weight="700" fill="#14532d">
+    <text x="284" y="1602">−l₄ sin α₄</text>
+    <text x="284" y="1650">l₄ cos α₄</text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="284" y="1622">水平 · 只有脚趾</text>
+    <text x="284" y="1670">竖直 · 只有脚趾</text>
+  </g>
+</svg>
+

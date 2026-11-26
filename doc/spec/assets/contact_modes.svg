@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 180" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <defs>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrSlate" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect x="16" y="12" width="908" height="156" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="36" y="38" font-size="13" font-weight="700" fill="#334155">模态切换（非固连地面）</text>
+
+  <g transform="translate(48, 52)">
+    <rect x="0" y="0" width="250" height="100" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="12" y="22" font-size="13" font-weight="800" fill="#14532d">Phase 1 · 双点</text>
+    <line x1="90" y1="84" x2="230" y2="84" stroke="#64748b" stroke-width="1.5"/>
+    <line x1="110" y1="40" x2="184" y2="18" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+    <polyline points="156,26 124,38 122,70 134,84 176,84" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="134" cy="84" r="3.5" fill="#16a34a"/>
+    <circle cx="176" cy="84" r="3.5" fill="#16a34a"/>
+  </g>
+
+  <line x1="312" y1="102" x2="348" y2="102" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+
+  <g transform="translate(360, 52)">
+    <rect x="0" y="0" width="250" height="100" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="12" y="22" font-size="13" font-weight="800" fill="#14532d">Phase 2 · 单点</text>
+    <line x1="90" y1="84" x2="230" y2="84" stroke="#64748b" stroke-width="1.5"/>
+    <line x1="114" y1="34" x2="188" y2="14" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+    <polyline points="160,22 132,40 136,62 148,70 186,84" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="186" cy="84" r="3.5" fill="#16a34a"/>
+  </g>
+
+  <line x1="624" y1="102" x2="660" y2="102" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+
+  <g transform="translate(672, 52)">
+    <rect x="0" y="0" width="230" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="12" y="22" font-size="13" font-weight="700" fill="#0f172a">Phase 3 · 离地腾空</text>
+    <line x1="80" y1="88" x2="210" y2="88" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <line x1="100" y1="32" x2="174" y2="14" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+    <polyline points="146,20 120,36 126,56 138,62 174,64" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+</svg>
