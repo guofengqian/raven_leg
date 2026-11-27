@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAVEN 三维模型</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #e7e2d8; color: #1c1917; font: 13px/1.45 system-ui, sans-serif; }
+  body { display: flex; }
+  #view { flex: 1 1 auto; min-width: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #panel {
+    position: relative; z-index: 2; flex: 0 0 328px; height: 100%;
+    overflow: auto; box-sizing: border-box; padding: 14px 14px 12px;
+    background: #f7f6f3; border-right: 1px solid #d6d3d1;
+  }
+  h1 { font-size: 16px; margin: 0 0 4px; font-weight: 650; }
+  .src { color: #57534e; margin: 0 0 10px; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  button {
+    font: inherit; border: 1px solid #d6d3d1; background: #fff; color: #1c1917;
+    border-radius: 6px; padding: 5px 8px; cursor: pointer;
+  }
+  button:hover { border-color: #a8a29e; }
+  button.on { border-color: #c2410c; color: #9a3412; background: #fff7ed; }
+  label.sl { display: grid; grid-template-columns: 74px 1fr 64px; gap: 6px; align-items: center; margin: 4px 0; }
+  label.sl span { color: #44403c; }
+  label.sl b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: #c2410c; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 8px 0; }
+  .checks label { display: flex; gap: 4px; align-items: center; cursor: pointer; }
+  #readout {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
+    background: #fff; border: 1px solid #e7e5e4; border-radius: 6px; padding: 8px;
+    white-space: pre; margin: 0;
+  }
+  #phase {
+    position: fixed; left: 344px; bottom: 16px; z-index: 2; margin: 0;
+    background: #f7f6f3; border: 1px solid #d6d3d1; border-radius: 6px; padding: 6px 10px;
+  }
+  details { margin-top: 10px; color: #44403c; }
+  details p { margin: 6px 0 0; }
+  .note { margin: 8px 0 0; color: #78716c; }
+</style>
+</head>
+<body>
+<aside id="panel">
+  <h1>RAVEN 三维模型</h1>
+  <p class="src">仿生对象是小嘴乌鸦。连杆长度、翼展、面积与初始角来自论文 Extended Data Table 2，和 <code>config/robot_paras.yaml</code> 一致。</p>
+  <div class="row" id="presets"></div>
+  <div class="row">
+    <button id="play" type="button">播放地空过渡</button>
+    <button id="cam" type="button">复位镜头</button>
+  </div>
+  <div id="sliders"></div>
+  <div class="checks">
+    <label><input id="plant" type="checkbox" checked /> 足端贴地</label>
+    <label><input id="both" type="checkbox" checked /> 双腿</label>
+    <label><input id="chain" type="checkbox" checked /> 连杆</label>
+    <label><input id="labels" type="checkbox" checked /> 标注</label>
+    <label><input id="aero" type="checkbox" checked /> 气动点</label>
+    <label><input id="axes" type="checkbox" /> 机身轴</label>
+    <label><input id="spin" type="checkbox" checked /> 螺旋桨</label>
+  </div>
+  <pre id="readout"></pre>
+  <p class="note">拖拽旋转，滚轮缩放，右键平移。地面网格一格 0.1 m。</p>
+  <details>
+    <summary>角度与未给定尺寸</summary>
+    <p>广义坐标与 <code>src/kinematics.py</code> 相同，逆时针为正：α₁ = q₃ + q₄，α₂ = α₁ + q₅，α₃ = α₂ + θ₃，α₄ = α₃ + q₆。θ₃ = 45° 是趾关节固定偏角，不进 q。</p>
+    <p>角度定义以第 1 章图 1.1 为准：q₄ 是机头纵轴到大腿的逆时针角，q₅ 是大腿到小腿的逆时针角，q₆ 是偏移杆 l₃ 到脚趾 l₄ 的逆时针角。q₆ = 0 时前脚掌与后脚掌共线，足底贴地；q₆ 增大则前脚掌相对后脚掌向上翘。</p>
+    <p>画面坐标：机头 +X，背侧 +Y，左翼 +Z。论文把背侧写成 z_B，这里改放到竖直轴上，数值仍是 P_wz、P_tz。</p>
+    <p>论文没给左右髋距、后趾长度、机身剖面和 V 尾上反角。模型里髋距 80 mm、后趾 42 mm、上反角 40°，只为看着像样机。上肢杆径也略加粗，真实件是 4 mm 与 3 mm 碳管。行走按正文的左右交替步态播放，速度约 0.2 m/s。Forward hop 和收腿飞行都是连续过程，不是动力学积分。</p>
+  </details>
+</aside>
+<canvas id="view"></canvas>
+<p id="phase" hidden></p>
+<script src="./vendor/three.min.js"></script>
+<script>
+
+const P = {
+  l1: 0.12, l2: 0.12, l3: 0.023, l4: 0.06, theta3: 45,
+  hipZ: 0.04, hallux: 0.042, halluxLocal: 180,
+  wingspan: 1, bodyLength: 0.5
+};
+
+const PRESETS = [
+  { id: "crouch", name: "下蹲待跳", q1: 0, q3: 10, q4: -135, q5: 80, q6: 0, plant: true },
+  { id: "walk", name: "行走", motion: "walk" },
+  { id: "hop", name: "Forward hop", motion: "hop" },
+  { id: "flight", name: "收腿飞行", motion: "flight" },
+  { id: "topo", name: "拓扑图姿态", q1: 0, q3: 25, q4: -185, q5: 65, q6: 50, plant: true }
+];
+
+const HOP = [
+  { t: 0.00, name: "Forward hop · 着地", q1: 0.00, q3: 10, q4: -135, q5: 80, q6: 0, plant: true },
+  { t: 0.28, name: "Forward hop · 下蹲", q1: 0.00, q3: 12, q4: -150, q5: 93, q6: 0, plant: true },
+  { t: 0.50, name: "Forward hop · 蹬地", q1: 0.04, q3: 24, q4: -90, q5: 21, q6: 0, plant: true },
+  { t: 0.74, name: "Forward hop · 腾空", q1: 0.10, q2: 0.32, q3: 18, q4: -120, q5: 55, q6: 0, plant: false },
+  { t: 1.02, name: "Forward hop · 前伸落地", q1: 0.14, q3: 12, q4: -125, q5: 68, q6: 0, plant: true },
+  { t: 1.28, name: "Forward hop · 稳住", q1: 0.16, q3: 10, q4: -135, q5: 80, q6: 0, plant: true }
+];
+
+const FLIGHT = [
+  { t: 0.0, name: "收腿飞行 · 下蹲蓄力", q1: 0.00, q3: 10, q4: -135, q5: 80, q6: 0, plant: true },
+  { t: 0.6, name: "收腿飞行 · 屈腿加压", q1: 0.00, q3: 14, q4: -155, q5: 96, q6: 0, plant: true },
+  { t: 1.3, name: "收腿飞行 · 腿部伸展", q1: 0.04, q3: 28, q4: -80, q5: 7, q6: 0, plant: true },
+  { t: 1.8, name: "收腿飞行 · 蹬离地面", q1: 0.10, q3: 36, q4: -60, q5: -21, q6: 0, plant: true },
+  { t: 2.4, name: "收腿飞行 · 离地", q1: 0.22, q2: 0.36, q3: 28, q4: -100, q5: 10, q6: 0, plant: false },
+  { t: 3.2, name: "收腿飞行 · 收髋", q1: 0.55, q2: 0.38, q3: 16, q4: -150, q5: 20, q6: 0, plant: false },
+  { t: 4.2, name: "收腿飞行 · 腿向后收", q1: 0.90, q2: 0.38, q3: 10, q4: -170, q5: 15, q6: 0, plant: false },
+  { t: 5.2, name: "收腿飞行 · 平飞", q1: 1.20, q2: 0.38, q3: 8, q4: -175, q5: 12, q6: 0, plant: false }
+];
+
+const rad = (d) => d * Math.PI / 180;
+const deg = (r) => r * 180 / Math.PI;
+const lerp = (a, b, u) => a + (b - a) * u;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const smooth = (u) => u * u * (3 - 2 * u);
+
+function foil(xc, t, m, p) {
+  const x = clamp(xc, 1e-4, 1);
+  const yt = 5 * t * (0.2969 * Math.sqrt(x) - 0.126 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+  const yc = x < p ? m / (p * p) * (2 * p * x - x * x) : m / ((1 - p) * (1 - p)) * ((1 - 2 * p) + 2 * p * x - x * x);
+  const dyc = x < p ? 2 * m / (p * p) * (p - x) : 2 * m / ((1 - p) * (1 - p)) * (p - x);
+  return { yt, yc, th: Math.atan(dyc) };
+}
+
+function chain(s) {
+  const a1 = rad(s.q3 + s.q4);
+  const a2 = a1 + rad(s.q5);
+  const a3 = a2 + rad(P.theta3);
+  const a4 = a3 + rad(s.q6);
+  const aH = a3 + rad(P.halluxLocal);
+  let x = s.q1, y = s.q2;
+  const hip = { x, y };
+  x += P.l1 * Math.cos(a1); y += P.l1 * Math.sin(a1); const ankle = { x, y };
+  x += P.l2 * Math.cos(a2); y += P.l2 * Math.sin(a2); const j3 = { x, y };
+  x += P.l3 * Math.cos(a3); y += P.l3 * Math.sin(a3); const toe = { x, y };
+  const hallux = { x: x + P.hallux * Math.cos(aH), y: y + P.hallux * Math.sin(aH) };
+  x += P.l4 * Math.cos(a4); y += P.l4 * Math.sin(a4); const claw = { x, y };
+  return { a1, a2, a3, a4, hip, ankle, j3, toe, claw, hallux };
+}
+
+function plantedQ2(s) {
+  const c = chain({ ...s, q1: 0, q2: 0 });
+  return -Math.min(c.claw.y, c.toe.y, c.hallux.y);
+}
+
+const state = {
+  q1: 0, q2: 0.183, q3: 10, q4: -135, q5: 80, q6: 0, plant: true,
+  leg: [{ q4: -135, q5: 80, q6: 0 }, { q4: -135, q5: 80, q6: 0 }]
+};
+let motion = null;
+let activePreset = "crouch";
+
+const sliderSpec = [
+  ["q1", "q1 水平", -0.2, 8, 0.01, "m"],
+  ["q2", "q2 髋高", 0, 0.8, 0.005, "m"],
+  ["q3", "q3 俯仰", -25, 70, 1, "°"],
+  ["q4", "q4 髋", -220, 80, 1, "°"],
+  ["q5", "q5 踝", -40, 180, 1, "°"],
+  ["q6", "q6 趾", -40, 80, 1, "°"]
+];
+
+const slidersEl = document.getElementById("sliders");
+const inputs = {};
+sliderSpec.forEach(([key, label, min, max, step, unit]) => {
+  const lab = document.createElement("label");
+  lab.className = "sl";
+  lab.innerHTML = `<span>${label}</span><input type="range" min="${min}" max="${max}" step="${step}" /><b></b>`;
+  const input = lab.querySelector("input");
+  inputs[key] = { input, valueEl: lab.querySelector("b"), unit };
+  input.addEventListener("input", () => {
+    stopPlay();
+    activePreset = "";
+    poseName = "自定义";
+    markPreset();
+    if (key === "q2") {
+      state.plant = false;
+      document.getElementById("plant").checked = false;
+    }
+    state[key] = Number(input.value);
+    if (key === "q4" || key === "q5" || key === "q6") setBothLegs(state.q4, state.q5, state.q6);
+    inputs[key].valueEl.textContent = fmt(state[key], unit);
+  });
+  slidersEl.appendChild(lab);
+});
+
+function fmt(v, unit) {
+  return unit === "m" ? v.toFixed(3) + " m" : v.toFixed(0) + "°";
+}
+
+function syncSliders() {
+  sliderSpec.forEach(([key, , , , , unit]) => {
+    inputs[key].input.value = state[key];
+    inputs[key].valueEl.textContent = fmt(state[key], unit);
+  });
+  document.getElementById("plant").checked = state.plant === true || state.plant === "feet";
+}
+
+function markPreset() {
+  document.querySelectorAll("#presets button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.id === activePreset);
+  });
+}
+
+let poseName = PRESETS[0].name;
+function setBothLegs(q4, q5, q6) {
+  state.leg = [{ q4, q5, q6 }, { q4, q5, q6 }];
+}
+function applySymmetric(s) {
+  state.q1 = s.q1;
+  state.q3 = s.q3;
+  state.q4 = s.q4;
+  state.q5 = s.q5;
+  state.q6 = s.q6;
+  state.plant = s.plant ? true : false;
+  if (!s.plant) state.q2 = s.q2;
+  setBothLegs(s.q4, s.q5, s.q6);
+  poseName = s.name || poseName;
+}
+function applyPreset(p) {
+  stopMotion();
+  activePreset = p.id;
+  poseName = p.name;
+  state.q1 = p.q1; state.q3 = p.q3; state.q4 = p.q4; state.q5 = p.q5; state.q6 = p.q6;
+  state.plant = p.plant;
+  state.q2 = p.plant ? plantedQ2(state) : p.q2;
+  setBothLegs(p.q4, p.q5, p.q6);
+  markPreset();
+  syncSliders();
+  updatePose();
+}
+
+function gaitPose(phase) {
+  const stance = phase < 0.6;
+  const u = stance ? phase / 0.6 : (phase - 0.6) / 0.4;
+  const su = smooth(u);
+  if (stance) {
+    const q4 = lerp(-118, -142, su);
+    return { q4, q5: -55 - q4, q6: 0 };
+  }
+  const lift = Math.sin(Math.PI * su);
+  return {
+    q4: lerp(-142, -118, su) - 18 * lift,
+    q5: lerp(87, 63, su) + 70 * lift,
+    q6: 0
+  };
+}
+
+function sampleTrack(keys, time) {
+  const last = keys[keys.length - 1];
+  const t = clamp(time, 0, last.t);
+  let i = 0;
+  while (i < keys.length - 2 && keys[i + 1].t < t) i += 1;
+  const a = keys[i];
+  const b = t >= last.t ? last : keys[i + 1];
+  const span = Math.max(1e-6, b.t - a.t);
+  const u = t >= last.t ? 1 : smooth((t - a.t) / span);
+  const s = {
+    name: u < 0.55 ? a.name : b.name,
+    q1: lerp(a.q1, b.q1, u),
+    q3: lerp(a.q3, b.q3, u),
+    q4: lerp(a.q4, b.q4, u),
+    q5: lerp(a.q5, b.q5, u),
+    q6: lerp(a.q6, b.q6, u)
+  };
+  if (a.plant && b.plant) s.plant = true;
+  else if (!a.plant && !b.plant) { s.plant = false; s.q2 = lerp(a.q2, b.q2, u); }
+  else if (a.plant && !b.plant) { s.plant = false; s.q2 = lerp(plantedQ2(a), b.q2, u); }
+  else { s.plant = false; s.q2 = lerp(a.q2, plantedQ2(b), u); }
+  return s;
+}
+
+document.getElementById("presets").innerHTML = PRESETS.map((p) =>
+  `<button type="button" data-id="${p.id}">${p.name}</button>`).join("");
+document.getElementById("presets").addEventListener("click", (e) => {
+  const btn = e.target.closest ? e.target.closest("button") : null;
+  if (!btn) return;
+  const p = PRESETS.find((x) => x.id === btn.dataset.id);
+  if (!p) return;
+  if (p.motion) beginMotion(p.motion, p.id, p.name);
+  else applyPreset(p);
+});
+
+const playBtn = document.getElementById("play");
+const phaseEl = document.getElementById("phase");
+function stopMotion() {
+  motion = null;
+  playBtn.textContent = "播放地空过渡";
+  playBtn.classList.remove("on");
+  phaseEl.hidden = true;
+}
+function stopPlay() { stopMotion(); }
+function beginMotion(kind, id, name) {
+  stopMotion();
+  motion = { kind, t: 0 };
+  activePreset = id;
+  poseName = name;
+  state.q1 = 0;
+  target.x = 0;
+  markPreset();
+  phaseEl.hidden = false;
+  if (kind === "flight") {
+    playBtn.textContent = "暂停";
+    playBtn.classList.add("on");
+  }
+  stepMotion(0);
+}
+playBtn.addEventListener("click", () => {
+  if (motion && motion.kind === "flight") { stopMotion(); return; }
+  beginMotion("flight", "flight", "收腿飞行");
+});
+
+document.getElementById("plant").addEventListener("change", (e) => {
+  stopPlay();
+  activePreset = "";
+  markPreset();
+  state.plant = e.target.checked;
+});
+["both", "chain", "labels", "aero", "axes", "spin"].forEach((id) => {
+  document.getElementById(id).addEventListener("change", () => {});
+});
+
+function stepMotion(dt) {
+  motion.t += dt;
+  if (motion.kind === "walk") {
+    const intro = 0.55;
+    const period = 1.24;
+    const u = smooth(Math.min(1, motion.t / intro));
+    const phase = (Math.max(0, motion.t - intro) / period) % 1;
+    const mix = (g) => ({
+      q4: lerp(-135, g.q4, u),
+      q5: lerp(80, g.q5, u),
+      q6: 0
+    });
+    state.q1 = 0.2 * Math.max(0, motion.t - intro);
+    state.q3 = 10;
+    state.leg[0] = mix(gaitPose(phase));
+    state.leg[1] = mix(gaitPose((phase + 0.5) % 1));
+    state.q4 = state.leg[0].q4;
+    state.q5 = state.leg[0].q5;
+    state.q6 = state.leg[0].q6;
+    state.plant = "feet";
+    const leftDown = phase < 0.6;
+    poseName = leftDown ? "行走 · 左腿支撑，右腿摆动" : "行走 · 右腿支撑，左腿摆动";
+  } else if (motion.kind === "hop") {
+    const dur = HOP[HOP.length - 1].t;
+    const cycle = Math.floor(motion.t / dur);
+    const s = sampleTrack(HOP, motion.t - cycle * dur);
+    s.q1 += cycle * HOP[HOP.length - 1].q1;
+    applySymmetric(s);
+  } else {
+    const end = FLIGHT[FLIGHT.length - 1].t;
+    const s = sampleTrack(FLIGHT, motion.t);
+    applySymmetric(s);
+    if (motion.t >= end) {
+      motion = null;
+      playBtn.textContent = "重播";
+      playBtn.classList.remove("on");
+    }
+  }
+  phaseEl.hidden = false;
+  phaseEl.textContent = poseName;
+  syncSliders();
+  target.x += (state.q1 - target.x) * 0.12;
+}
+
+const canvas = document.getElementById("view");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+function resizeView() {
+  const w = Math.max(1, canvas.clientWidth);
+  const h = Math.max(1, canvas.clientHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.setSize(w, h, false);
+  if (camera) {
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+}
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0xe7e2d8, 1);
+
+const scene = new THREE.Scene();
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+scene.add(new THREE.HemisphereLight(0xf8fafc, 0xcfc3b0, 0.7));
+const dir = new THREE.DirectionalLight(0xffffff, 1.25);
+dir.position.set(1.2, 2.4, 1.1);
+dir.castShadow = true;
+dir.shadow.mapSize.set(2048, 2048);
+dir.shadow.camera.near = 0.2;
+dir.shadow.camera.far = 8;
+dir.shadow.camera.left = -1.6;
+dir.shadow.camera.right = 1.6;
+dir.shadow.camera.top = 1.6;
+dir.shadow.camera.bottom = -1.6;
+dir.shadow.bias = -0.00035;
+scene.add(dir);
+
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(8, 8),
+  new THREE.MeshStandardMaterial({ color: 0xddd6c8, roughness: 0.95, metalness: 0 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+const grid = new THREE.GridHelper(4, 40, 0xb7afa2, 0xcfc6b8);
+grid.position.y = 0.001;
+scene.add(grid);
+
+const scale = new THREE.Group();
+const tickMat = new THREE.MeshBasicMaterial({ color: 0x1c1917 });
+const bar = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.003, 0.003), tickMat);
+bar.position.set(0.05, 0, 0);
+scale.add(bar);
+[0, 0.1].forEach((x) => {
+  const t = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.012, 0.003), tickMat);
+  t.position.set(x, 0.004, 0);
+  scale.add(t);
+});
+scale.position.set(0.62, 0.002, 0.22);
+scene.add(scale);
+
+function makeLabel(text) {
+  const c = document.createElement("canvas");
+  c.width = 256; c.height = 64;
+  const g = c.getContext("2d");
+  g.font = "600 28px sans-serif";
+  g.fillStyle = "#1c1917";
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.fillText(text, 128, 34);
+  const tex = new THREE.CanvasTexture(c);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+  sprite.scale.set(0.11, 0.028, 1);
+  sprite.renderOrder = 5;
+  return sprite;
+}
+const scaleLabel = makeLabel("100 mm");
+scaleLabel.position.set(0.67, 0.028, 0.22);
+scene.add(scaleLabel);
+
+function mat(color, rough, metal) {
+  return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+}
+const shellMat = mat(0xd5d8de, 0.62, 0.04);
+const wingMat = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: 0.86, metalness: 0, side: THREE.DoubleSide });
+const tailMat = new THREE.MeshStandardMaterial({ color: 0xe4e0d6, roughness: 0.88, metalness: 0, side: THREE.DoubleSide });
+const carbon = mat(0x2a2e33, 0.38, 0.22);
+const motorMat = mat(0x2a62d6, 0.42, 0.18);
+const gearMat = mat(0x9aa3ad, 0.45, 0.2);
+const pulleyMat = mat(0xe7e9ee, 0.4, 0.08);
+const footMat = mat(0xc5cad1, 0.5, 0.08);
+const padMat = mat(0xc6b196, 0.7, 0.02);
+const clawMat = mat(0x3f3f46, 0.45, 0.1);
+const beltMat = mat(0x1c1917, 0.55, 0.05);
+const markerMat = new THREE.MeshBasicMaterial({ color: 0xea580c, depthTest: false });
+
+function rod(len, radius, material) {
+  const g = new THREE.CylinderGeometry(radius, radius, len, 12);
+  g.rotateZ(-Math.PI / 2);
+  g.translate(len / 2, 0, 0);
+  const m = new THREE.Mesh(g, material);
+  m.castShadow = true;
+  return m;
+}
+function disc(radius, thick, material) {
+  const g = new THREE.CylinderGeometry(radius, radius, thick, 24);
+  g.rotateX(Math.PI / 2);
+  const m = new THREE.Mesh(g, material);
+  m.castShadow = true;
+  return m;
+}
+function actuatorStack(side) {
+  const g = new THREE.Group();
+  const parts = [
+    [0.012, 0.016, 0.011, motorMat],
+    [0.026, 0.012, 0.013, gearMat],
+    [0.040, 0.016, 0.011, motorMat],
+    [0.054, 0.012, 0.013, gearMat]
+  ];
+  parts.forEach(([z, h, r, material]) => {
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 20), material);
+    cyl.rotation.x = Math.PI / 2;
+    cyl.position.z = side * z;
+    cyl.position.y = -0.008;
+    cyl.castShadow = true;
+    g.add(cyl);
+  });
+  return g;
+}
+
+function makeLoft(opt) {
+  const nC = 12;
+  const nS = 7;
+  const N = nC * 2;
+  const ring = nS + 1;
+  const pos = [];
+  const centers = [];
+  for (let i = 0; i < ring; i++) {
+    const s = i / nS;
+    const chord = lerp(opt.root, opt.tip, s);
+    const z = opt.span * s;
+    const sweep = (opt.sweep || 0) * s;
+    for (let k = 0; k < N; k++) {
+      const upper = k <= nC;
+      const xc = upper ? 1 - k / nC : (k - nC) / nC;
+      const sign = upper ? 1 : -1;
+      const f = foil(xc, opt.thick, opt.camber, opt.camberPos);
+      const sin = Math.sin(f.th), cos = Math.cos(f.th);
+      const xSurf = xc - sign * f.yt * sin;
+      const ySurf = f.yc + sign * f.yt * cos;
+      pos.push((0.25 - xSurf) * chord - sweep, ySurf * chord, z);
+    }
+    const fc = foil(0.4, 0, opt.camber, opt.camberPos);
+    centers.push((0.25 - 0.4) * chord - sweep, fc.yc * chord, z);
+  }
+  const baseCenter = pos.length / 3;
+  pos.push(...centers);
+  const index = [];
+  for (let i = 0; i < nS; i++) {
+    for (let k = 0; k < N; k++) {
+      const k2 = (k + 1) % N;
+      const a = i * N + k, b = i * N + k2, c = (i + 1) * N + k, d = (i + 1) * N + k2;
+      index.push(a, c, d, a, d, b);
+    }
+  }
+  for (let i = 0; i < ring; i++) {
+    const center = baseCenter + i;
+    const o = i * N;
+    for (let k = 0; k < N; k++) {
+      const k2 = (k + 1) % N;
+      if (i === 0) index.push(center, o + k2, o + k);
+      else if (i === nS) index.push(center, o + k, o + k2);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setIndex(index);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+const robot = new THREE.Group();
+const body = new THREE.Group();
+robot.add(body);
+scene.add(robot);
+dir.target = robot;
+
+const shellShape = new THREE.Shape();
+shellShape.moveTo(0.19, 0.012);
+shellShape.bezierCurveTo(0.12, 0.040, 0.02, 0.040, -0.08, 0.034);
+shellShape.bezierCurveTo(-0.18, 0.028, -0.27, 0.020, -0.33, 0.016);
+shellShape.lineTo(-0.33, 0.006);
+shellShape.bezierCurveTo(-0.22, -0.006, -0.08, -0.012, 0.04, -0.010);
+shellShape.bezierCurveTo(0.12, -0.008, 0.16, 0.000, 0.19, 0.012);
+const shellGeo = new THREE.ExtrudeGeometry(shellShape, {
+  depth: 0.07, bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004,
+  bevelSegments: 2, curveSegments: 10
+});
+shellGeo.translate(0, 0, -0.035);
+const shell = new THREE.Mesh(shellGeo, shellMat);
+shell.castShadow = true;
+shell.receiveShadow = true;
+body.add(shell);
+
+const wingGeo = makeLoft({ root: 0.23, tip: 0.14, span: 0.47, thick: 0.09, camber: 0.022, camberPos: 0.35, sweep: 0.03 });
+const wingL = new THREE.Mesh(wingGeo, wingMat);
+wingL.position.set(-0.02, 0.052, 0.03);
+wingL.rotation.z = rad(7);
+wingL.castShadow = true;
+wingL.receiveShadow = true;
+body.add(wingL);
+const wingR = wingL.clone();
+wingR.position.z = -0.03;
+wingR.scale.z = -1;
+body.add(wingR);
+const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.06), shellMat);
+pylon.position.set(-0.02, 0.044, 0);
+body.add(pylon);
+
+const tailGeo = makeLoft({ root: 0.18, tip: 0.09, span: 0.32, thick: 0.03, camber: 0, camberPos: 0.4, sweep: 0.06 });
+function addTail(side) {
+  const m = new THREE.Mesh(tailGeo, tailMat);
+  m.position.set(-0.30, 0.018, 0);
+  m.rotation.x = -side * rad(40);
+  m.rotation.z = rad(1);
+  if (side < 0) m.scale.z = -1;
+  m.castShadow = true;
+  body.add(m);
+}
+addTail(1);
+addTail(-1);
+
+const prop = new THREE.Group();
+prop.position.set(0.198, 0.014, 0);
+const bladeGeo = new THREE.BoxGeometry(0.004, 0.095, 0.018);
+bladeGeo.translate(0, 0.058, 0);
+const bladeMat = mat(0x4b5563, 0.45, 0.15);
+prop.add(new THREE.Mesh(bladeGeo, bladeMat));
+const bladeB = bladeGeo.clone();
+bladeB.rotateX(Math.PI);
+prop.add(new THREE.Mesh(bladeB, bladeMat));
+const spinner = new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 12), shellMat);
+spinner.scale.set(1.4, 0.8, 0.8);
+prop.add(spinner);
+body.add(prop);
+
+const pw = new THREE.Mesh(new THREE.SphereGeometry(0.008, 12, 10), markerMat);
+pw.position.set(-0.02, 0.042, 0);
+pw.renderOrder = 4;
+const pt = pw.clone();
+pt.position.set(-0.28, 0.074, 0);
+body.add(pw, pt);
+const axes = new THREE.AxesHelper(0.09);
+body.add(axes);
+
+const axle = rod(0.08, 0.003, carbon);
+axle.geometry.rotateY(-Math.PI / 2);
+axle.position.set(0, 0, -0.04);
+body.add(axle);
+
+function makeLeg(side) {
+  const root = new THREE.Group();
+  root.position.z = side * P.hipZ;
+  const hip = new THREE.Group();
+  root.add(hip);
+  hip.add(actuatorStack(side));
+  const pulleyH = disc(0.016, 0.004, pulleyMat);
+  hip.add(pulleyH);
+  [[0, 0.004], [0.0032, -0.002], [-0.0032, -0.002]].forEach(([y, z]) => {
+    const r = rod(P.l1, 0.0024, carbon);
+    r.position.set(0, y, z);
+    hip.add(r);
+  });
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(P.l1 - 0.02, 0.0016, 0.0045), beltMat);
+  belt.position.set(P.l1 / 2, 0.014, side * 0.007);
+  hip.add(belt);
+
+  const ankle = new THREE.Group();
+  ankle.position.x = P.l1;
+  hip.add(ankle);
+  ankle.add(disc(0.011, 0.0035, pulleyMat));
+  ankle.add(rod(P.l2, 0.0022, carbon));
+
+  const offset = new THREE.Group();
+  offset.position.x = P.l2;
+  offset.rotation.z = rad(P.theta3);
+  ankle.add(offset);
+  offset.add(rod(P.l3, 0.002, carbon));
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.014, 0.0035), footMat);
+  plate.position.set(P.l3 - 0.018, -0.004, 0);
+  plate.castShadow = true;
+  offset.add(plate);
+
+  const toe = new THREE.Group();
+  toe.position.x = P.l3;
+  offset.add(toe);
+  const palmPad = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.003, 12), padMat);
+  palmPad.position.y = -0.008;
+  toe.add(palmPad);
+
+  [-22, 0, 22].forEach((splay) => {
+    const g = new THREE.Group();
+    g.rotation.y = rad(-side * splay);
+    g.add(rod(P.l4, splay === 0 ? 0.0032 : 0.0026, footMat));
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 10, 8), clawMat);
+    tip.position.x = P.l4;
+    g.add(tip);
+    const sole = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.0025, 10), padMat);
+    sole.position.set(P.l4 * 0.72, -0.005, 0);
+    g.add(sole);
+    if (splay === 0) {
+      const tipAnchor = new THREE.Object3D();
+      tipAnchor.position.x = P.l4;
+      g.add(tipAnchor);
+      g.userData.tip = tipAnchor;
+    }
+    toe.add(g);
+  });
+
+  const hallux = new THREE.Group();
+  hallux.position.x = P.l3;
+  hallux.rotation.z = rad(P.halluxLocal);
+  hallux.add(rod(P.hallux, 0.0026, footMat));
+  const htip = new THREE.Mesh(new THREE.SphereGeometry(0.004, 10, 8), clawMat);
+  htip.position.x = P.hallux;
+  hallux.add(htip);
+  const hpad = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.0025, 10), padMat);
+  hpad.position.set(P.hallux * 0.62, 0.005, 0);
+  hallux.add(hpad);
+  offset.add(hallux);
+
+  body.add(root);
+  const center = toe.children.find((ch) => ch.userData.tip);
+  return { root, hip, ankle, toe, j1: root, j2: ankle, j3: offset, j4: toe, claw: center.userData.tip };
+}
+const legs = [makeLeg(1), makeLeg(-1)];
+
+const chainMats = [0x334155, 0x15803d, 0x64748b, 0xc2410c].map((c) => new THREE.LineBasicMaterial({ color: c }));
+const chainLines = chainMats.map((material) => {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(6), 3));
+  const line = new THREE.Line(geo, material);
+  scene.add(line);
+  return line;
+});
+
+const labelTexts = [["J1", legs[0].j1], ["J2", legs[0].j2], ["J4", legs[0].j4], ["claw", legs[0].claw], ["pw", pw], ["pt", pt]];
+const labels = labelTexts.map(([text, obj]) => {
+  const sprite = makeLabel(text);
+  scene.add(sprite);
+  return { sprite, obj };
+});
+const vA = new THREE.Vector3();
+const vB = new THREE.Vector3();
+const readout = document.getElementById("readout");
+
+function footDrop(q3, joint) {
+  const c = chain({ q1: 0, q2: 0, q3, q4: joint.q4, q5: joint.q5, q6: joint.q6 });
+  return Math.min(c.claw.y, c.toe.y, c.hallux.y);
+}
+function updatePose() {
+  if (state.plant === true) state.q2 = plantedQ2(state);
+  else if (state.plant === "feet") {
+    state.q2 = -Math.min(footDrop(state.q3, state.leg[0]), footDrop(state.q3, state.leg[1]));
+  }
+  robot.position.set(state.q1, state.q2, 0);
+  ground.position.x = state.q1;
+  grid.position.x = state.q1;
+  body.rotation.z = rad(state.q3);
+  legs.forEach((leg, i) => {
+    const joint = state.leg[i];
+    leg.hip.rotation.z = rad(joint.q4);
+    leg.ankle.rotation.z = rad(joint.q5);
+    leg.toe.rotation.z = rad(joint.q6);
+  });
+  legs[1].root.visible = document.getElementById("both").checked;
+  axes.visible = document.getElementById("axes").checked;
+  pw.visible = pt.visible = document.getElementById("aero").checked;
+  const showChain = document.getElementById("chain").checked;
+  const showLabels = document.getElementById("labels").checked;
+  chainLines.forEach((ln) => { ln.visible = showChain; });
+  labels.forEach((lb) => { lb.sprite.visible = showLabels; });
+
+  const anchors = [legs[0].j1, legs[0].j2, legs[0].j3, legs[0].j4, legs[0].claw];
+  const pts = anchors.map((obj) => obj.getWorldPosition(new THREE.Vector3()));
+  chainLines.forEach((ln, i) => {
+    const arr = ln.geometry.attributes.position.array;
+    arr[0] = pts[i].x; arr[1] = pts[i].y; arr[2] = pts[i].z + 0.012;
+    arr[3] = pts[i + 1].x; arr[4] = pts[i + 1].y; arr[5] = pts[i + 1].z + 0.012;
+    ln.geometry.attributes.position.needsUpdate = true;
+  });
+  labels.forEach(({ sprite, obj }) => {
+    obj.getWorldPosition(vA);
+    sprite.position.copy(vA);
+    sprite.position.y += 0.028;
+  });
+
+  const j0 = state.leg[0];
+  const j1 = state.leg[1];
+  const fk = chain({ ...state, q4: j0.q4, q5: j0.q5, q6: j0.q6 });
+  legs[0].claw.getWorldPosition(vB);
+  const errMm = Math.hypot(vB.x - fk.claw.x, vB.y - fk.claw.y) * 1000;
+  const split = Math.abs(j0.q4 - j1.q4) > 0.5 || Math.abs(j0.q5 - j1.q5) > 0.5;
+  readout.textContent =
+    `姿态 ${poseName}\n` +
+    (split
+      ? `左髋 ${j0.q4.toFixed(0)}°  左踝 ${j0.q5.toFixed(0)}°  左趾 ${j0.q6.toFixed(0)}°\n右髋 ${j1.q4.toFixed(0)}°  右踝 ${j1.q5.toFixed(0)}°  右趾 ${j1.q6.toFixed(0)}°\n`
+      : `q3 ${state.q3.toFixed(1)}°   q4 ${state.q4.toFixed(1)}°\nq5 ${state.q5.toFixed(1)}°   q6 ${state.q6.toFixed(1)}°\n`) +
+    `α ${[fk.a1, fk.a2, fk.a3, fk.a4].map((a) => deg(a).toFixed(0)).join("  ")} °\n` +
+    `髋高 q2  ${state.q2.toFixed(3)} m\n` +
+    `爪尖     ${fk.claw.x.toFixed(3)} , ${fk.claw.y.toFixed(3)} m\n` +
+    `趾关节   ${fk.toe.x.toFixed(3)} , ${fk.toe.y.toFixed(3)} m\n` +
+    `三维误差 ${errMm.toFixed(2)} mm`;
+}
+
+const target = new THREE.Vector3(0.02, 0.12, 0);
+const home = { r: 1.95, phi: 1.16, theta: 0.82, tx: 0.0, ty: 0.15, tz: 0 };
+const spherical = { r: home.r, phi: home.phi, theta: home.theta };
+const camera = new THREE.PerspectiveCamera(38, 1, 0.02, 20);
+resizeView();
+
+function updateCamera() {
+  const { r, phi, theta } = spherical;
+  camera.position.set(
+    target.x + r * Math.sin(phi) * Math.sin(theta),
+    target.y + r * Math.cos(phi),
+    target.z + r * Math.sin(phi) * Math.cos(theta)
+  );
+  camera.lookAt(target);
+}
+document.getElementById("cam").addEventListener("click", () => {
+  spherical.r = home.r; spherical.phi = home.phi; spherical.theta = home.theta;
+  target.set(home.tx, home.ty, home.tz);
+});
+
+let drag = null;
+canvas.addEventListener("pointerdown", (e) => {
+  if (e.target !== canvas) return;
+  drag = { x: e.clientX, y: e.clientY, button: e.button, ...spherical, tx: target.x, ty: target.y, tz: target.z };
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (drag.button === 2 || drag.button === 1 || e.shiftKey) {
+    const dist = drag.r * 0.00115;
+    const sinT = Math.sin(drag.theta), cosT = Math.cos(drag.theta);
+    target.x = drag.tx - dx * dist * cosT;
+    target.z = drag.tz + dx * dist * sinT;
+    target.y = drag.ty + dy * dist;
+  } else {
+    spherical.theta = drag.theta - dx * 0.008;
+    spherical.phi = clamp(drag.phi - dy * 0.006, 0.18, Math.PI - 0.18);
+  }
+});
+canvas.addEventListener("pointerup", () => { drag = null; });
+canvas.addEventListener("pointercancel", () => { drag = null; });
+canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  spherical.r = clamp(spherical.r * Math.exp(e.deltaY * 0.001), 0.25, 4.5);
+}, { passive: false });
+
+addEventListener("resize", resizeView);
+
+applyPreset(PRESETS[0]);
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  if (motion) stepMotion(dt);
+  if (document.getElementById("spin").checked) {
+    const fast = motion && motion.kind === "flight" && state.q2 > 0.32;
+    prop.rotation.x += dt * (fast ? 36 : 8);
+  }
+  dir.position.set(state.q1 + 1.0, 2.3, 0.9);
+  updatePose();
+  updateCamera();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,44 +1,158 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 180" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 518" width="100%" height="auto" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
   <defs>
-    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+    <filter id="cardShadowCM" x="-4%" y="-4%" width="108%" height="112%" filterUnits="userSpaceOnUse">
       <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.06"/>
     </filter>
-    <marker id="arrSlate" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrSlateCM" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
     </marker>
   </defs>
 
-  <rect x="16" y="12" width="908" height="156" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
-  <text x="36" y="38" font-size="13" font-weight="700" fill="#334155">模态切换（非固连地面）</text>
+  <!-- ======================== Phase 1：双点全足接触 ======================== -->
+  <g transform="translate(14, 14)">
+    <rect width="632" height="162" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.8" filter="url(#cardShadowCM)"/>
+    <rect x="0" y="0" width="632" height="34" rx="12" fill="#f0fdf4"/>
+    <rect x="0" y="20" width="632" height="14" fill="#f0fdf4"/>
+    <line x1="0" y1="34" x2="632" y2="34" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="16" y="23" font-size="15" font-weight="800" fill="#14532d">Phase 1 · 双点全足接触（4 维约束 · 式 (5)）</text>
 
-  <g transform="translate(48, 52)">
-    <rect x="0" y="0" width="250" height="100" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <text x="12" y="22" font-size="13" font-weight="800" fill="#14532d">Phase 1 · 双点</text>
-    <line x1="90" y1="84" x2="230" y2="84" stroke="#64748b" stroke-width="1.5"/>
-    <line x1="110" y1="40" x2="184" y2="18" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
-    <polyline points="156,26 124,38 122,70 134,84 176,84" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
-    <circle cx="134" cy="84" r="3.5" fill="#16a34a"/>
-    <circle cx="176" cy="84" r="3.5" fill="#16a34a"/>
+    <!-- 左侧示意图 -->
+    <rect x="14" y="44" width="196" height="106" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <line x1="26" y1="126" x2="196" y2="126" stroke="#64748b" stroke-width="1.8"/>
+    <line x1="66" y1="70" x2="146" y2="54" stroke="#334155" stroke-width="4.8" stroke-linecap="round"/>
+    <polyline points="114,61 82,78 80,108 92,126 152,126" fill="none" stroke="#1e293b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="92" cy="126" r="4.6" fill="#16a34a"/>
+    <circle cx="152" cy="126" r="4.6" fill="#16a34a"/>
+    <text x="92" y="142" text-anchor="middle" font-size="11.5" font-weight="800" fill="#15803d">p_toe</text>
+    <text x="152" y="142" text-anchor="middle" font-size="11.5" font-weight="800" fill="#15803d">p_tip</text>
+
+    <!-- 右侧矩阵展开框 -->
+    <rect x="224" y="44" width="394" height="106" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+
+    <!-- 左半：速度约束 -->
+    <text x="236" y="61" font-size="11.5" font-weight="700" fill="#475569">速度约束</text>
+    <path d="M 244 70 L 236 70 L 236 118 L 244 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 284 70 L 292 70 L 292 118 L 284 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="264" y="88">J_toe</text>
+      <text x="264" y="110">J_tip</text>
+    </g>
+    <text x="313" y="99" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̇ =</text>
+    <path d="M 341 70 L 334 70 L 334 118 L 341 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 355 70 L 362 70 L 362 118 L 355 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="800" fill="#0f172a" text-anchor="middle">
+      <text x="348" y="88">0</text>
+      <text x="348" y="110">0</text>
+    </g>
+
+    <!-- 分隔线 -->
+    <line x1="378" y1="52" x2="378" y2="122" stroke="#bbf7d0" stroke-width="1.2"/>
+
+    <!-- 右半：加速度约束 -->
+    <text x="392" y="61" font-size="11.5" font-weight="700" fill="#475569">加速度约束</text>
+    <path d="M 400 70 L 392 70 L 392 118 L 400 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 440 70 L 448 70 L 448 118 L 440 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="420" y="88">J_toe</text>
+      <text x="420" y="110">J_tip</text>
+    </g>
+    <text x="476" y="99" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̈ = −</text>
+    <path d="M 510 70 L 502 70 L 502 118 L 510 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 550 70 L 558 70 L 558 118 L 550 118" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="530" y="88">J̇_toe</text>
+      <text x="530" y="110">J̇_tip</text>
+    </g>
+    <text x="572" y="99" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̇</text>
+
+    <text x="236" y="140" font-size="11.5" fill="#475569">双点堆叠：<tspan font-family="ui-serif, Georgia, serif" font-weight="700" fill="#166534">J_c,1 ∈ ℝ⁴ˣ⁶</tspan>（足掌 2 维 + 爪尖 2 维）</text>
   </g>
 
-  <line x1="312" y1="102" x2="348" y2="102" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+  <!-- 切换箭头 1→2 -->
+  <line x1="112" y1="178" x2="112" y2="198" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrSlateCM)"/>
+  <text x="128" y="193" font-size="12.5" font-weight="700" fill="#475569">E1：足掌离地（Fy,toe = 0）</text>
 
-  <g transform="translate(360, 52)">
-    <rect x="0" y="0" width="250" height="100" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <text x="12" y="22" font-size="13" font-weight="800" fill="#14532d">Phase 2 · 单点</text>
-    <line x1="90" y1="84" x2="230" y2="84" stroke="#64748b" stroke-width="1.5"/>
-    <line x1="114" y1="34" x2="188" y2="14" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
-    <polyline points="160,22 132,40 136,62 148,70 186,84" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
-    <circle cx="186" cy="84" r="3.5" fill="#16a34a"/>
+  <!-- ======================== Phase 2：单点爪尖翻转 ======================== -->
+  <g transform="translate(14, 204)">
+    <rect width="632" height="156" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.8" filter="url(#cardShadowCM)"/>
+    <rect x="0" y="0" width="632" height="34" rx="12" fill="#f0fdf4"/>
+    <rect x="0" y="20" width="632" height="14" fill="#f0fdf4"/>
+    <line x1="0" y1="34" x2="632" y2="34" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="16" y="23" font-size="15" font-weight="800" fill="#14532d">Phase 2 · 单点爪尖翻转（2 维约束 · 式 (9)）</text>
+
+    <!-- 左侧示意图 -->
+    <rect x="14" y="44" width="196" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <line x1="26" y1="122" x2="196" y2="122" stroke="#64748b" stroke-width="1.8"/>
+    <line x1="68" y1="68" x2="148" y2="52" stroke="#334155" stroke-width="4.8" stroke-linecap="round"/>
+    <polyline points="116,59 88,80 94,100 108,108 156,122" fill="none" stroke="#1e293b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="108" cy="108" r="3.8" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <text x="76" y="114" font-size="10.5" fill="#94a3b8">抬离</text>
+    <circle cx="156" cy="122" r="4.6" fill="#16a34a"/>
+    <text x="156" y="138" text-anchor="middle" font-size="11.5" font-weight="800" fill="#15803d">p_tip</text>
+
+    <!-- 右侧矩阵展开框 -->
+    <rect x="224" y="44" width="394" height="100" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+
+    <!-- 左半：速度约束 -->
+    <text x="236" y="61" font-size="11.5" font-weight="700" fill="#475569">速度约束</text>
+    <path d="M 244 70 L 236 70 L 236 116 L 244 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 290 70 L 298 70 L 298 116 L 290 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="267" y="88">J_tip,x</text>
+      <text x="267" y="109">J_tip,y</text>
+    </g>
+    <text x="318" y="98" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̇ =</text>
+    <path d="M 344 70 L 337 70 L 337 116 L 344 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 358 70 L 365 70 L 365 116 L 358 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13.5" font-weight="800" fill="#0f172a" text-anchor="middle">
+      <text x="351" y="88">0</text>
+      <text x="351" y="109">0</text>
+    </g>
+
+    <!-- 分隔线 -->
+    <line x1="378" y1="52" x2="378" y2="120" stroke="#bbf7d0" stroke-width="1.2"/>
+
+    <!-- 右半：加速度约束 -->
+    <text x="392" y="61" font-size="11.5" font-weight="700" fill="#475569">加速度约束</text>
+    <path d="M 400 70 L 392 70 L 392 116 L 400 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 446 70 L 454 70 L 454 116 L 446 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="423" y="88">J_tip,x</text>
+      <text x="423" y="109">J_tip,y</text>
+    </g>
+    <text x="481" y="98" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̈ = −</text>
+    <path d="M 514 70 L 506 70 L 506 116 L 514 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 560 70 L 568 70 L 568 116 L 560 116" fill="none" stroke="#14532d" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="ui-serif, Georgia, serif" font-size="13" font-weight="800" fill="#15803d" text-anchor="middle">
+      <text x="537" y="88">J̇_tip,x</text>
+      <text x="537" y="109">J̇_tip,y</text>
+    </g>
+    <text x="582" y="98" font-family="ui-serif, Georgia, serif" font-size="14.5" font-weight="700" fill="#0f172a">q̇</text>
+
+    <text x="236" y="135" font-size="11.5" fill="#475569">单点退化：<tspan font-family="ui-serif, Georgia, serif" font-weight="700" fill="#166534">J_c,2 = J_tip ∈ ℝ²ˣ⁶</tspan>（仅爪尖 X、Y 两维）</text>
   </g>
 
-  <line x1="624" y1="102" x2="660" y2="102" stroke="#64748b" stroke-width="2" marker-end="url(#arrSlate)"/>
+  <!-- 切换箭头 2→3 -->
+  <line x1="112" y1="362" x2="112" y2="382" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrSlateCM)"/>
+  <text x="128" y="377" font-size="12.5" font-weight="700" fill="#475569">E2：爪尖离地（Fy,tip = 0）</text>
 
-  <g transform="translate(672, 52)">
-    <rect x="0" y="0" width="230" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
-    <text x="12" y="22" font-size="13" font-weight="700" fill="#0f172a">Phase 3 · 离地腾空</text>
-    <line x1="80" y1="88" x2="210" y2="88" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
-    <line x1="100" y1="32" x2="174" y2="14" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
-    <polyline points="146,20 120,36 126,56 138,62 174,64" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- ======================== Phase 3：离地腾空 ======================== -->
+  <g transform="translate(14, 388)">
+    <rect width="632" height="116" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6" filter="url(#cardShadowCM)"/>
+    <rect x="0" y="0" width="632" height="34" rx="12" fill="#f1f5f9"/>
+    <rect x="0" y="20" width="632" height="14" fill="#f1f5f9"/>
+    <line x1="0" y1="34" x2="632" y2="34" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="16" y="23" font-size="15" font-weight="800" fill="#0f172a">Phase 3 · 离地腾空（0 维 · 无约束）</text>
+
+    <!-- 左侧示意图 -->
+    <rect x="14" y="44" width="196" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <line x1="26" y1="96" x2="196" y2="96" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5,4"/>
+    <line x1="68" y1="60" x2="146" y2="48" stroke="#334155" stroke-width="4.6" stroke-linecap="round"/>
+    <polyline points="114,54 88,68 94,82 108,86 144,86" fill="none" stroke="#1e293b" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- 右侧单框 -->
+    <rect x="224" y="44" width="394" height="60" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+    <text x="238" y="68" font-size="14" font-weight="800" fill="#334155">无接触约束（f_c = 0）</text>
+    <text x="238" y="92" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-serif, Georgia, serif">M q̈ + C q̇ + g = Sᵀ τ + f_ext<tspan font-family="-apple-system,sans-serif" font-size="12" font-weight="400" fill="#64748b">（第 3 章式 23）</tspan></text>
   </g>
 </svg>

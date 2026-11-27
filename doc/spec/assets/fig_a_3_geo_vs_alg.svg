@@ -14,8 +14,8 @@
     </marker>
   </defs>
 
-  <!-- 顶部总标题 -->
-  <text x="16" y="34" font-size="19" font-weight="800" fill="#0f172a">几何法 vs 代数法对照（以第 5 列 q₅ 为例）</text>
+  <!-- 顶部总标题（居中大号） -->
+  <text x="290" y="34" text-anchor="middle" font-size="19" font-weight="800" fill="#0f172a">以第 5 列 q₅（踝关节，影响下游 l₂∼l₄）为例</text>
 
   <!-- ======================== 上卡：路线 A 几何法 ======================== -->
   <g transform="translate(14, 50)">
