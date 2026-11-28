@@ -11,13 +11,13 @@
   <!-- 顶部一句话主旨 -->
   <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">不涉及质量与力：搭好 6-DOF 几何骨架 → 写出踩地约束 → 建立接触力映射</text>
 
-  <!-- ======================== 卡 ①：定姿态 ======================== -->
+  <!-- ======================== 卡 ①：广义坐标 q ======================== -->
   <g transform="translate(12, 42)">
     <rect width="202" height="170" rx="12" fill="#ffffff" stroke="#7dd3fc" stroke-width="1.8" filter="url(#cardShadow10)"/>
     <rect x="0" y="0" width="202" height="36" rx="12" fill="#f0f9ff"/>
     <rect x="0" y="22" width="202" height="14" fill="#f0f9ff"/>
     <line x1="0" y1="36" x2="202" y2="36" stroke="#bae6fd" stroke-width="1"/>
-    <text x="101" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0c4a6e">① 定姿态 · 坐标 q</text>
+    <text x="101" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0c4a6e">① 广义坐标 q</text>
 
     <rect x="12" y="48" width="178" height="72" rx="8" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
     <text x="101" y="76" text-anchor="middle" font-size="17" font-weight="800" fill="#0284c7" font-family="ui-serif, Georgia, serif">q ∈ ℝ⁶</text>
@@ -30,13 +30,13 @@
   <!-- 箭头 1→2 -->
   <line x1="218" y1="127" x2="233" y2="127" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrSlate10)"/>
 
-  <!-- ======================== 卡 ②：推约束 ======================== -->
+  <!-- ======================== 卡 ②：无滑移约束 ======================== -->
   <g transform="translate(239, 42)">
     <rect width="202" height="170" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.8" filter="url(#cardShadow10)"/>
     <rect x="0" y="0" width="202" height="36" rx="12" fill="#f0fdf4"/>
     <rect x="0" y="22" width="202" height="14" fill="#f0fdf4"/>
     <line x1="0" y1="36" x2="202" y2="36" stroke="#bbf7d0" stroke-width="1"/>
-    <text x="101" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#14532d">② 推约束 · J_c, J̇_c</text>
+    <text x="101" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#14532d">② 无滑移约束</text>
 
     <rect x="12" y="48" width="178" height="72" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
     <text x="101" y="75" text-anchor="middle" font-size="15" font-weight="800" fill="#15803d" font-family="ui-serif, Georgia, serif">J_c q̇ = 0</text>
@@ -49,7 +49,7 @@
   <!-- 箭头 2→3 -->
   <line x1="445" y1="127" x2="460" y2="127" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrSlate10)"/>
 
-  <!-- ======================== 卡 ③：留接口 ======================== -->
+  <!-- ======================== 卡 ③：接触力映射 ======================== -->
   <g transform="translate(466, 42)">
     <rect width="202" height="170" rx="12" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.8" filter="url(#cardShadow10)"/>
     <rect x="0" y="0" width="202" height="36" rx="12" fill="#f5f3ff"/>

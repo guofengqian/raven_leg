@@ -145,7 +145,7 @@
 
   <!-- ======================== 上右：广义坐标列向量（重点放大） ======================== -->
   <rect x="632" y="16" width="292" height="420" rx="12" fill="#f0f9ff" stroke="#bae6fd" stroke-width="2" filter="url(#cardShadow)"/>
-  <text x="648" y="46" font-size="17" font-weight="800" fill="#0c4a6e">广义坐标 q（浮基构型）</text>
+  <text x="648" y="46" font-size="17" font-weight="800" fill="#0c4a6e">广义坐标 q（整机构型）</text>
   <text x="648" y="68" font-size="11" fill="#0369a1">浮基位姿 3 + 开链关节 3 = 6-DOF · 逆时针为正</text>
 
   <!-- q = 垂直居中 -->
